@@ -1,0 +1,17 @@
+.main-content {
+  position: relative;
+  margin: 0 auto;
+  width: 640px;
+  max-width: 100%;
+  margin-top: 100px;
+}
+
+.right-btn {
+  align-self: flex-end;
+}
+
+.collapse-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
