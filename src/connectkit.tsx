@@ -54,7 +54,7 @@ const config = createConfig({
     evmWalletConnectors({
       // TODO: replace it with your app metadata.
       metadata: {
-        name: 'Connectkit Demo',
+        name: 'OpenHands',
         icon: typeof window !== 'undefined' ? `${window.location.origin}/favicon.ico` : '',
         description: 'Particle Connectkit React Scaffold.',
         url: typeof window !== 'undefined' ? window.location.origin : '',
