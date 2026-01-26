@@ -7,7 +7,7 @@ export default function Header() {
     <header className={styles.header}>
       <nav className={styles.nav}>
         <div className={styles['nav-start']}>
-          <div className={styles['nav-start-slogan']}>particle network</div>
+          <div className={styles['nav-start-slogan']}>Open Hands</div>
           <img src={logo} width={36} height={36} alt='logo'></img>
         </div>
         <div className={styles['nav-content']}>
