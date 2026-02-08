@@ -1,6 +1,7 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { ParticleConnectkit } from './connectkit';
+import { BrowserRouter } from 'react-router-dom';
 import App from './App';
 import './index.css';
 
@@ -9,8 +10,10 @@ const root = createRoot(container!);
 
 root.render(
   <React.StrictMode>
-    <ParticleConnectkit>
-      <App />
-    </ParticleConnectkit>
+    <BrowserRouter>
+      <ParticleConnectkit>
+        <App />
+      </ParticleConnectkit>
+    </BrowserRouter>
   </React.StrictMode>
 );
