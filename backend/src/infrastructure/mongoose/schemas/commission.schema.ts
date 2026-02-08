@@ -1,0 +1,80 @@
+// src/infrastructure/mongoose/schemas/commission.schema.ts
+import mongoose, { Schema } from 'mongoose';
+import { CommissionStatus } from '@entities/commission.entity';
+
+const commissionSchema = new Schema(
+  {
+    _id: {
+      type: String,
+      default: () => crypto.randomUUID(),
+    },
+    title: {
+      type: String,
+      required: true,
+      maxlength: 200,
+    },
+    description: {
+      type: String,
+      required: true,
+      maxlength: 5000,
+    },
+    requesterId: {
+      type: String,
+      required: true,
+      ref: 'User',
+    },
+    providerId: {
+      type: String,
+      required: true,
+      ref: 'User',
+    },
+    status: {
+      type: String,
+      enum: Object.values(CommissionStatus),
+      default: CommissionStatus.PENDING,
+    },
+    price: {
+      type: Number,
+      required: true,
+      min: 0.01,
+      max: 1000000,
+    },
+    deadline: {
+      type: Date,
+      default: null,
+    },
+    startedAt: {
+      type: Date,
+      default: null,
+    },
+    completedAt: {
+      type: Date,
+      default: null,
+    },
+    cancelledAt: {
+      type: Date,
+      default: null,
+    },
+    ratingId: {
+      type: String,
+      ref: 'Rating',
+      default: null,
+    },
+  },
+  {
+    timestamps: true,
+    toJSON: {
+      transform: (_, ret) => {
+        ret.id = ret._id;
+        delete ret._id;
+        delete ret.__v;
+      },
+    },
+  }
+);
+
+commissionSchema.index({ requesterId: 1, status: 1 });
+commissionSchema.index({ providerId: 1, status: 1 });
+commissionSchema.index({ status: 1, createdAt: 1 });
+
+export const CommissionModel = mongoose.model('Commission', commissionSchema);

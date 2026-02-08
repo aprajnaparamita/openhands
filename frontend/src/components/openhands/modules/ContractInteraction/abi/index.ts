@@ -1,4 +1,4 @@
-// ERC20 代币常用函数
+// ERC20 Token Common Functions
 export const ERC20ABI = [
   {
     constant: true,
