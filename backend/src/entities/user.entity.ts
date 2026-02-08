@@ -1,47 +1,113 @@
-import { hash, compare } from 'bcryptjs';
+import bcrypt from 'bcryptjs';
+const { hash, compare } = bcrypt;
 import crypto from 'crypto';
 
 export interface UserPersistenceData {
   id: string;
-  email: string;
-  password: string;
+  email?: string;
+  password?: string;
+  walletAddress?: string;
+  role?: string;
+  name?: string;
+  bio?: string;
   createdAt?: Date;
   updatedAt?: Date;
 }
 
 export interface UserCreateData {
-  email: string;
-  password: string;
+  email?: string;
+  password?: string;
+  walletAddress?: string;
+  role?: string;
+  name?: string;
+  bio?: string;
 }
 
 export class User {
   private constructor(
     private readonly _id: string,
-    private _email: string,
-    private _password: string,
+    private _email: string | undefined,
+    private _password: string | undefined,
+    private _walletAddress: string | undefined,
+    private _role: string | undefined,
+    private _name: string | undefined,
+    private _bio: string | undefined,
     private readonly _createdAt: Date = new Date(),
     private _updatedAt: Date = new Date(),
   ) {}
 
-  // 팩토리 메서드 - 새로운 사용자 생성
   static async create(data: UserCreateData): Promise<User> {
     const id = User.generateId();
-    const validatedEmail = User.validateEmail(data.email);
-    const hashedPassword = await User.hashPassword(data.password);
+    let validatedEmail: string | undefined;
+    let hashedPassword: string | undefined;
 
-    return new User(id, validatedEmail, hashedPassword);
+    if (data.email) {
+      validatedEmail = User.validateEmail(data.email);
+    }
+    if (data.password) {
+      hashedPassword = await User.hashPassword(data.password);
+    }
+
+    return new User(
+      id, 
+      validatedEmail, 
+      hashedPassword, 
+      data.walletAddress,
+      data.role,
+      data.name,
+      data.bio
+    );
   }
 
-  // 기존 데이터로부터 복원 (DB에서 조회한 경우)
   static fromPersistence(data: UserPersistenceData): User {
     return new User(
       data.id,
       data.email,
       data.password,
+      data.walletAddress,
+      data.role,
+      data.name,
+      data.bio,
       data.createdAt || new Date(),
       data.updatedAt || new Date(),
     );
   }
+
+  toPersistence(): UserPersistenceData {
+    return {
+      id: this._id,
+      email: this._email,
+      password: this._password,
+      walletAddress: this._walletAddress,
+      role: this._role,
+      name: this._name,
+      bio: this._bio,
+      createdAt: this._createdAt,
+      updatedAt: this._updatedAt,
+    };
+  }
+
+  toResponse() {
+    return {
+      id: this._id,
+      email: this._email,
+      walletAddress: this._walletAddress,
+      role: this._role,
+      name: this._name,
+      bio: this._bio,
+      createdAt: this._createdAt,
+      updatedAt: this._updatedAt,
+    };
+  }
+
+  updateProfile(data: { role?: string; name?: string; bio?: string; walletAddress?: string }) {
+    if (data.role) this._role = data.role;
+    if (data.name) this._name = data.name;
+    if (data.bio) this._bio = data.bio;
+    if (data.walletAddress) this._walletAddress = data.walletAddress;
+    this._updatedAt = new Date();
+  }
+
 
   // 비즈니스 로직 - 이메일 변경
   async changeEmail(newEmail: string): Promise<void> {

@@ -5,6 +5,7 @@ export interface IUsersRepository {
   findAll(): Promise<User[]>;
   findById(id: string): Promise<User | undefined>;
   findByEmail(email: string): Promise<User | undefined>;
+  findByWalletAddress(walletAddress: string): Promise<User | undefined>;
   save(user: User): Promise<User>;
   update(id: string, user: User): Promise<User | undefined>;
   delete(id: string): Promise<boolean>;
@@ -25,6 +26,11 @@ export class UsersRepository implements IUsersRepository {
 
   async findByEmail(email: string): Promise<User | undefined> {
     const userData = this.users.find((u) => u.email === email.toLowerCase());
+    return userData ? User.fromPersistence(userData) : undefined;
+  }
+
+  async findByWalletAddress(walletAddress: string): Promise<User | undefined> {
+    const userData = this.users.find((u) => u.walletAddress === walletAddress);
     return userData ? User.fromPersistence(userData) : undefined;
   }
 

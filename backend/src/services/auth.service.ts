@@ -1,4 +1,5 @@
-import { sign } from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
+const { sign } = jwt;
 import { injectable, inject } from 'tsyringe';
 import { NODE_ENV, SECRET_KEY } from '@config/env';
 import { HttpException } from '@exceptions/httpException';

@@ -34,7 +34,8 @@ export class UsersService {
     if (!existingUser) throw new HttpException(404, 'User not found');
 
     // Entity의 도메인 메서드를 사용하여 업데이트
-    await existingUser.updateProfile(updateData);
+    if (updateData.email) await existingUser.changeEmail(updateData.email);
+    if (updateData.password) await existingUser.changePassword(updateData.password);
 
     const updated = await this.usersRepository.update(id, existingUser);
     if (!updated) throw new HttpException(404, 'User not found');

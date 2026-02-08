@@ -31,7 +31,7 @@ export class UsersController {
 
   updateUser = asyncHandler(async (req: Request, res: Response) => {
     const userId: string = req.params.id;
-    const updateData: { email?: string; password?: string } = req.body;
+    const updateData = req.body;
     const user = await this.userService.updateUser(userId, updateData);
 
     res.json({ data: user.toResponse(), message: 'update' });

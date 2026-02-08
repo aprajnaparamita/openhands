@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
-import { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
+const { JsonWebTokenError, TokenExpiredError } = jwt;
 import { ZodError } from 'zod';
 import { NODE_ENV } from '@config/env';
 import { HttpException } from '@exceptions/httpException';

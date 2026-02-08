@@ -16,6 +16,11 @@ export function useAuthCheck() {
         if (response.status === 404) {
           // User doesn't exist, redirect to profile setup
           navigate('/profile/setup');
+        } else if (response.ok) {
+          // User exists, redirect to profile page if on landing page
+          if (window.location.pathname === '/') {
+            navigate('/dashboard');
+          }
         }
       } catch (error) {
         console.error('Error checking user profile:', error);
