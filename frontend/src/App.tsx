@@ -8,6 +8,9 @@ import { CommissionDashboard } from './components/Commission/CommissionDashboard
 import { CreateCommission } from './components/Commission/CreateCommission';
 import { CommissionDetail } from './components/Commission/CommissionDetail';
 import { ResetUser } from './components/ResetUser';
+import { EditProfile } from './components/EditProfile';
+import { BrowseArtists } from './components/BrowseArtists';
+import { MyAccount } from './components/MyAccount';
 import Header from './components/header';
 import OpenHands from './components/openhands';
 import styles from './App.module.css';
@@ -44,6 +47,36 @@ function App() {
             element={
               isConnected ? (
                 <ProfileSetup />
+              ) : (
+                <Navigate to="/" replace />
+              )
+            }
+          />
+          <Route
+            path="/profile/edit"
+            element={
+              isConnected ? (
+                <EditProfile />
+              ) : (
+                <Navigate to="/" replace />
+              )
+            }
+          />
+          <Route
+            path="/browse-artists"
+            element={
+              isConnected ? (
+                <BrowseArtists />
+              ) : (
+                <Navigate to="/" replace />
+              )
+            }
+          />
+          <Route
+            path="/account"
+            element={
+              isConnected ? (
+                <MyAccount />
               ) : (
                 <Navigate to="/" replace />
               )

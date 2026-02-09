@@ -7,17 +7,6 @@ const userSchema = new Schema(
       type: String,
       default: () => crypto.randomUUID(),
     },
-    email: {
-      type: String,
-      unique: true,
-      lowercase: true,
-      trim: true,
-      maxlength: 254,
-      sparse: true, // Allow null/undefined to be unique
-    },
-    password: {
-      type: String,
-    },
     walletAddress: {
       type: String,
       unique: true,
@@ -34,6 +23,16 @@ const userSchema = new Schema(
     bio: {
       type: String,
       maxlength: 1000,
+    },
+    profileImage: {
+      type: String,
+    },
+    headerImage: {
+      type: String,
+    },
+    portfolio: {
+      type: [String],
+      default: [],
     },
     workDescription: {
       type: String,
@@ -63,7 +62,6 @@ const userSchema = new Schema(
         ret.id = ret._id;
         delete ret._id;
         delete ret.__v;
-        delete ret.password;
       },
     },
     toObject: {

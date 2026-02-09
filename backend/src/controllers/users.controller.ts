@@ -34,6 +34,13 @@ export class UsersController {
     const updateData = req.body;
     const user = await this.userService.updateUser(userId, updateData);
 
+    // After updating, we should probably set the auth cookie if it's not set
+    // This is a simple way to ensure the user is logged in after profile creation
+    // In a real app we'd use a proper auth service
+    const token = this.userService.createToken(user);
+    const cookie = this.userService.createCookie(token);
+
+    res.setHeader('Set-Cookie', [cookie]);
     res.json({ data: user.toResponse(), message: 'update' });
   });
 

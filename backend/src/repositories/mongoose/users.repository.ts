@@ -92,6 +92,9 @@ export class MongooseUsersRepository implements IUsersRepository {
       role: mongooseDoc.role,
       name: mongooseDoc.name,
       bio: mongooseDoc.bio,
+      profileImage: mongooseDoc.profileImage,
+      headerImage: mongooseDoc.headerImage,
+      portfolio: mongooseDoc.portfolio,
       createdAt: mongooseDoc.createdAt,
       updatedAt: mongooseDoc.updatedAt,
     };

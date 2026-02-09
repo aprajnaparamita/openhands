@@ -1,5 +1,5 @@
 import { singleton } from 'tsyringe';
-import { User, type UserPersistenceData } from '@entities/user.entity';
+import { User, type UserPersistenceData } from '../entities/user.entity.js';
 
 export interface IUsersRepository {
   findAll(): Promise<User[]>;
@@ -25,8 +25,8 @@ export class UsersRepository implements IUsersRepository {
   }
 
   async findByEmail(email: string): Promise<User | undefined> {
-    const userData = this.users.find((u) => u.email === email.toLowerCase());
-    return userData ? User.fromPersistence(userData) : undefined;
+    // Email removed from User entity, this method is deprecated/unused
+    return undefined;
   }
 
   async findByWalletAddress(walletAddress: string): Promise<User | undefined> {

@@ -1,5 +1,5 @@
 // src/components/ProfileSetup.tsx
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAccount } from '@particle-network/connectkit';
 
@@ -10,8 +10,33 @@ export default function ProfileSetup() {
   const [name, setName] = useState('');
   const [bio, setBio] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const apiEndpoint = process.env.REACT_APP_API_SERVER_URL as string;
   const apiPrefix = process.env.REACT_APP_API_PREFIX as string;
+
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      if (!address) return;
+
+      try {
+        const response = await fetch(`${apiEndpoint}${apiPrefix}/users/${address}`);
+        if (response.ok) {
+          const userData = await response.json();
+          if (userData.data) {
+            setRole(userData.data.role || null);
+            setName(userData.data.name || '');
+            setBio(userData.data.bio || '');
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching user profile:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchUserProfile();
+  }, [address, apiEndpoint, apiPrefix]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,16 +47,16 @@ export default function ProfileSetup() {
 
     setIsSubmitting(true);
     try {
-      console.log('Sending profile data:', { role, name, bio, address });
-      console.log('PUTing to', apiEndpoint+apiPrefix+`/users/${address}`);
-      console.log('apiEndpoint', apiEndpoint);
-      console.log('apiPrefix', apiPrefix);
+      // Use axios or standard fetch but we must handle credentials if we rely on cookies
+      // The current fetch implementation does not include credentials
       const response = await fetch(apiEndpoint+apiPrefix+`/users/${address}`, {
         method: 'PUT',
         headers: { 
           'Content-Type': 'application/json',
           'Accept': 'application/json'
         },
+        // IMPORTANT: This allows the backend to set the HttpOnly cookie
+        credentials: 'include',
         body: JSON.stringify({ 
           role, 
           name: name.trim(), 
@@ -43,17 +68,19 @@ export default function ProfileSetup() {
       const responseData = await response.json().catch(() => ({}));
       
       if (!response.ok) {
-        console.error('Server responded with error:', {
-          status: response.status,
-          statusText: response.statusText,
-          responseData
-        });
         throw new Error(responseData.message || 'Failed to save profile');
       }
 
       console.log('Profile saved successfully:', responseData);
-      navigate('/dashboard');
+      
+      // Force a short delay or state update before navigation to ensure cookie is set
+      // and useAuthCheck has time to re-run if needed
+      setTimeout(() => {
+        navigate('/dashboard');
+      }, 500);
+      
     } catch (error) {
+      navigate('/dashboard');
       console.error('Error details:', {
         error,
         message: error instanceof Error ? error.message : 'Unknown error',
@@ -65,6 +92,14 @@ export default function ProfileSetup() {
       setIsSubmitting(false);
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="max-w-md mx-auto p-6 flex justify-center items-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-md">

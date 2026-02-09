@@ -15,19 +15,39 @@ export function useAuthCheck() {
 
       try {
         const response = await fetch(`${apiEndpoint}${apiPrefix}/users/${address}`);
+        
+        // Handle 404 (User Not Found)
         if (response.status === 404) {
-          // User doesn't exist, redirect to profile setup
-          if (window.location.pathname !== '/profile/setup') {
+          // If we are NOT on setup/reset, go to setup
+          if (window.location.pathname !== '/profile/setup' && window.location.pathname !== '/reset') {
             navigate('/profile/setup');
           }
-        } else if (response.ok) {
-          // User exists, redirect to dashboard if on landing page or setup page
-          if (window.location.pathname === '/' || window.location.pathname === '/profile/setup') {
-            navigate('/dashboard');
+          return;
+        }
+
+        // Handle Success
+        if (response.ok) {
+          const userData = await response.json();
+          const hasRole = !!userData.data?.role;
+          
+          // Case 1: Incomplete Profile (No Role)
+          if (!hasRole) {
+            // Redirect to setup if not already there
+            if (window.location.pathname !== '/profile/setup' && window.location.pathname !== '/reset') {
+              navigate('/profile/setup');
+            }
+          } 
+          // Case 2: Complete Profile (Has Role)
+          else {
+            // Redirect to dashboard if currently on landing or setup
+            if (window.location.pathname === '/' || window.location.pathname === '/profile/setup') {
+              navigate('/dashboard');
+            }
           }
         }
       } catch (error) {
         console.error('Error checking user profile:', error);
+        // Do NOT redirect on network error to avoid loops
       }
     };
 

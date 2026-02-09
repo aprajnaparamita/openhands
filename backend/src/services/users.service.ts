@@ -1,30 +1,57 @@
 import { injectable, inject } from 'tsyringe';
+import jwt from 'jsonwebtoken';
+const { sign } = jwt;
+import { NODE_ENV, SECRET_KEY } from '../config/env.js';
 import { HttpException } from '../exceptions/httpException.js';
 import { User, type UserCreateData } from '../entities/user.entity.js';
 import { UsersRepository } from '../repositories/users.repository.js';
 import type { IUsersRepository } from '../repositories/users.repository.js';
+import { DataStoredInToken, TokenData } from '../interfaces/auth.interface.js';
 
 @injectable()
 export class UsersService {
   constructor(@inject(UsersRepository) private usersRepository: IUsersRepository) {}
+
+  public createToken(user: User): TokenData {
+    if (!SECRET_KEY) throw new Error('SECRET_KEY is not defined');
+
+    if (user.id === undefined) {
+      throw new Error('User id is undefined');
+    }
+
+    const dataStoredInToken: DataStoredInToken = { id: user.id };
+    const expiresIn = 60 * 60 * 24 * 7; // 7 days
+    const token = sign(dataStoredInToken, SECRET_KEY as string, { expiresIn });
+    return { expiresIn, token };
+  }
+
+  public createCookie(tokenData: TokenData): string {
+    return `Authorization=${tokenData.token}; HttpOnly; Max-Age=${
+      tokenData.expiresIn
+    }; Path=/; SameSite=Lax;${NODE_ENV === 'production' ? ' Secure;' : ''}`;
+  }
 
   async getAllUsers(): Promise<User[]> {
     return this.usersRepository.findAll();
   }
 
   async getUserById(id: string): Promise<User> {
-    const user = await this.usersRepository.findById(id);
+    let user: User | undefined;
+    
+    // Check if ID is a wallet address
+    if (id.startsWith('0x') || id.length > 30) {
+      user = await this.usersRepository.findByWalletAddress(id);
+    }
+
+    if (!user) {
+      user = await this.usersRepository.findById(id);
+    }
+
     if (!user) throw new HttpException(404, 'User not found');
     return user;
   }
 
   async createUser(userData: UserCreateData): Promise<User> {
-    // Check email existence only if email is provided
-    if (userData.email) {
-      const exists = await this.usersRepository.findByEmail(userData.email);
-      if (exists) throw new HttpException(409, 'Email already exists');
-    }
-    
     if (userData.walletAddress) {
       const exists = await this.usersRepository.findByWalletAddress(userData.walletAddress);
       if (exists) return exists; // Idempotency for wallet login
@@ -36,7 +63,15 @@ export class UsersService {
     return user;
   }
 
-  async updateUser(id: string, updateData: { email?: string; password?: string; role?: string; name?: string; bio?: string; walletAddress?: string }): Promise<User> {
+  async updateUser(id: string, updateData: { 
+    role?: string; 
+    name?: string; 
+    bio?: string; 
+    walletAddress?: string;
+    profileImage?: string;
+    headerImage?: string;
+    portfolio?: string[];
+  }): Promise<User> {
     let existingUser: User | undefined;
     
     if (id.startsWith('0x') || id.length > 30) {
@@ -67,11 +102,7 @@ export class UsersService {
     }
 
     // Update using the domain method of the Entity
-    // Handle specific updates
-    if (updateData.email) await existingUser.changeEmail(updateData.email);
-    if (updateData.password) await existingUser.changePassword(updateData.password);
-
-    existingUser.updateProfile(updateData.name, updateData.bio, updateData.role);
+    await existingUser.updateProfile(updateData);
 
     const updated = await this.usersRepository.update(existingUser.id, existingUser);
     if (!updated) throw new HttpException(404, 'User not found');
