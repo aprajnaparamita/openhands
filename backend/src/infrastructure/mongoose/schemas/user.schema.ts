@@ -1,6 +1,5 @@
 // src/infrastructure/mongoose/schemas/user.schema.ts
 import mongoose, { Schema } from 'mongoose';
-import { UserType } from '@entities/user.entity';
 
 const userSchema = new Schema(
   {
@@ -10,33 +9,31 @@ const userSchema = new Schema(
     },
     email: {
       type: String,
-      required: true,
       unique: true,
       lowercase: true,
       trim: true,
       maxlength: 254,
+      sparse: true, // Allow null/undefined to be unique
     },
     password: {
       type: String,
-      required: true,
     },
-    userType: {
+    walletAddress: {
       type: String,
-      enum: Object.values(UserType),
-      required: true,
+      unique: true,
+      sparse: true,
     },
-    profileImage: {
+    role: {
       type: String,
-      default: null,
+      enum: ['artist', 'requester', 'admin'],
     },
-    headerImage: {
+    name: {
       type: String,
-      default: null,
+      maxlength: 100,
     },
     bio: {
       type: String,
       maxlength: 1000,
-      default: null,
     },
     workDescription: {
       type: String,
@@ -62,7 +59,7 @@ const userSchema = new Schema(
   {
     timestamps: true,
     toJSON: {
-      transform: (_, ret) => {
+      transform: (_, ret: any) => {
         ret.id = ret._id;
         delete ret._id;
         delete ret.__v;
@@ -70,7 +67,7 @@ const userSchema = new Schema(
       },
     },
     toObject: {
-      transform: (_, ret) => {
+      transform: (_, ret: any) => {
         ret.id = ret._id;
         delete ret._id;
         delete ret.__v;

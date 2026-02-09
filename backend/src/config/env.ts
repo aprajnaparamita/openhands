@@ -38,6 +38,17 @@ const EnvSchema = z
 
     SENTRY_DSN: z.string().default(''),
     REDIS_URL: z.string().url().default('redis://localhost:6379'),
+
+    // Cloudinary
+    CLOUDINARY_CLOUD_NAME: z.string().min(1),
+    CLOUDINARY_API_KEY: z.string().min(1),
+    CLOUDINARY_API_SECRET: z.string().min(1),
+    CLOUDINARY_UPLOAD_FOLDER: z.string().default('openhands'),
+
+    // PubNub
+    PUBNUB_PUBLISH_KEY: z.string().min(1),
+    PUBNUB_SUBSCRIBE_KEY: z.string().min(1),
+    PUBNUB_SECRET_KEY: z.string().min(1),
   })
   .strip();
 
@@ -70,6 +81,15 @@ export const CREDENTIALS = env.CREDENTIALS;
 export const SENTRY_DSN = env.SENTRY_DSN;
 export const REDIS_URL = env.REDIS_URL;
 export const API_SERVER_URL = env.API_SERVER_URL;
+
+export const CLOUDINARY_CLOUD_NAME = env.CLOUDINARY_CLOUD_NAME;
+export const CLOUDINARY_API_KEY = env.CLOUDINARY_API_KEY;
+export const CLOUDINARY_API_SECRET = env.CLOUDINARY_API_SECRET;
+export const CLOUDINARY_UPLOAD_FOLDER = env.CLOUDINARY_UPLOAD_FOLDER;
+
+export const PUBNUB_PUBLISH_KEY = env.PUBNUB_PUBLISH_KEY;
+export const PUBNUB_SUBSCRIBE_KEY = env.PUBNUB_SUBSCRIBE_KEY;
+export const PUBNUB_SECRET_KEY = env.PUBNUB_SECRET_KEY;
 
 // Provide CORS Origins as an array (empty if none)
 export const CORS_ORIGIN_LIST =

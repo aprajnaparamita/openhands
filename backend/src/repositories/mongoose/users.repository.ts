@@ -1,9 +1,9 @@
 // src/repositories/mongoose/users.repository.ts
 import { singleton } from 'tsyringe';
 import mongoose from 'mongoose';
-import { User, UserPersistenceData, UserType } from '@entities/user.entity';
-import { IUsersRepository } from '../users.repository';
-import { UserModel } from '@infrastructure/mongoose/schemas/user.schema';
+import { User, UserPersistenceData } from '../../entities/user.entity.js';
+import { IUsersRepository } from '../users.repository.js';
+import { UserModel } from '../../infrastructure/mongoose/schemas/user.schema.js';
 
 @singleton()
 export class MongooseUsersRepository implements IUsersRepository {
@@ -19,6 +19,11 @@ export class MongooseUsersRepository implements IUsersRepository {
 
   async findByEmail(email: string): Promise<User | undefined> {
     const user = await UserModel.findOne({ email: email.toLowerCase() }).lean();
+    return user ? User.fromPersistence(this.mapToPersistence(user)) : undefined;
+  }
+
+  async findByWalletAddress(walletAddress: string): Promise<User | undefined> {
+    const user = await UserModel.findOne({ walletAddress }).lean();
     return user ? User.fromPersistence(this.mapToPersistence(user)) : undefined;
   }
 
@@ -48,7 +53,7 @@ export class MongooseUsersRepository implements IUsersRepository {
   }
 
   async findProviders(limit: number = 20, offset: number = 0): Promise<User[]> {
-    const providers = await UserModel.find({ userType: UserType.PROVIDER })
+    const providers = await UserModel.find({ role: 'artist' })
       .sort({ 'cachedAverageRating': -1, 'cachedTotalRatings': -1 })
       .skip(offset)
       .limit(limit)
@@ -59,7 +64,7 @@ export class MongooseUsersRepository implements IUsersRepository {
 
   async findAvailableProviders(limit: number = 20, offset: number = 0): Promise<User[]> {
     const providers = await UserModel.find({ 
-      userType: UserType.PROVIDER,
+      role: 'artist',
       isAvailable: true 
     })
       .sort({ 'cachedAverageRating': -1, 'cachedTotalRatings': -1 })
@@ -83,14 +88,10 @@ export class MongooseUsersRepository implements IUsersRepository {
       id: mongooseDoc._id || mongooseDoc.id,
       email: mongooseDoc.email,
       password: mongooseDoc.password,
-      userType: mongooseDoc.userType,
-      profileImage: mongooseDoc.profileImage,
-      headerImage: mongooseDoc.headerImage,
+      walletAddress: mongooseDoc.walletAddress,
+      role: mongooseDoc.role,
+      name: mongooseDoc.name,
       bio: mongooseDoc.bio,
-      workDescription: mongooseDoc.workDescription,
-      isAvailable: mongooseDoc.isAvailable,
-      cachedAverageRating: mongooseDoc.cachedAverageRating,
-      cachedTotalRatings: mongooseDoc.cachedTotalRatings || 0,
       createdAt: mongooseDoc.createdAt,
       updatedAt: mongooseDoc.updatedAt,
     };

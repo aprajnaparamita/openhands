@@ -115,6 +115,22 @@ export class User {
     this._updatedAt = new Date();
   }
 
+  // Business Logic - Update Profile
+  updateProfile(name?: string, bio?: string, role?: string): void {
+    if (name !== undefined) this._name = name;
+    if (bio !== undefined) this._bio = bio;
+    if (role !== undefined) this._role = role;
+    this._updatedAt = new Date();
+  }
+
+  // Business Logic - Reset Profile (for testing)
+  resetProfile(): void {
+    this._name = undefined;
+    this._bio = undefined;
+    this._role = undefined;
+    this._updatedAt = new Date();
+  }
+
   // Verify Password
   async verifyPassword(inputPassword: string): Promise<boolean> {
     if (!this._password) return false;

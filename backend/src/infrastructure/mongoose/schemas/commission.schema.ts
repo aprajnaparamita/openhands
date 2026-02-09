@@ -25,8 +25,9 @@ const commissionSchema = new Schema(
     },
     providerId: {
       type: String,
-      required: true,
+      required: false,
       ref: 'User',
+      default: null,
     },
     status: {
       type: String,
@@ -41,6 +42,22 @@ const commissionSchema = new Schema(
     },
     deadline: {
       type: Date,
+      default: null,
+    },
+    referenceImages: {
+      type: [String],
+      default: [],
+    },
+    finalArtwork: {
+      type: String,
+      default: null,
+    },
+    finalArtworkHash: {
+      type: String,
+      default: null,
+    },
+    escrowAddress: {
+      type: String,
       default: null,
     },
     startedAt: {

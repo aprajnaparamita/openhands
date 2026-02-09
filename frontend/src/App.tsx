@@ -4,6 +4,10 @@ import { useAuthCheck } from './hooks/useAuthCheck';
 import { useAccount } from '@particle-network/connectkit';
 import ProfileSetup from './components/ProfileSetup';
 import Dashboard from './components/Dashboard';
+import { CommissionDashboard } from './components/Commission/CommissionDashboard';
+import { CreateCommission } from './components/Commission/CreateCommission';
+import { CommissionDetail } from './components/Commission/CommissionDetail';
+import { ResetUser } from './components/ResetUser';
 import Header from './components/header';
 import OpenHands from './components/openhands';
 import styles from './App.module.css';
@@ -49,12 +53,35 @@ function App() {
             path="/dashboard"
             element={
               isConnected ? (
-                <Dashboard />
+                <CommissionDashboard />
               ) : (
                 <Navigate to="/" replace />
               )
             }
           />
+          <Route
+            path="/commissions/create"
+            element={
+              isConnected ? (
+                <CreateCommission />
+              ) : (
+                <Navigate to="/" replace />
+              )
+            }
+          />
+          <Route
+            path="/commissions/:id"
+            element={
+              isConnected ? (
+                <CommissionDetail />
+              ) : (
+                <Navigate to="/" replace />
+              )
+            }
+          />
+          {process.env.NODE_ENV === 'development' && (
+            <Route path="/reset" element={<ResetUser />} />
+          )}
         </Routes>
       </main>
     </div>

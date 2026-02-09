@@ -1,9 +1,10 @@
 import { Router } from 'express';
 import { injectable, inject } from 'tsyringe';
-import { UsersController } from '@controllers/users.controller';
-import { createUserSchema, updateUserSchema } from '@dtos/users.dto';
-import { Routes } from '@interfaces/routes.interface';
-import { ValidationMiddleware } from '@middlewares/validation.middleware';
+import { UsersController } from '../controllers/users.controller.js';
+import { createUserSchema, updateUserSchema } from '../dtos/users.dto.js';
+import { Routes } from '../interfaces/routes.interface.js';
+import { ValidationMiddleware } from '../middlewares/validation.middleware.js';
+import { AuthMiddleware } from '../middlewares/auth.middleware.js';
 
 @injectable()
 export class UsersRoute implements Routes {
@@ -26,6 +27,10 @@ export class UsersRoute implements Routes {
       `${this.path}/:id`,
       ValidationMiddleware(updateUserSchema),
       this.userController.updateUser,
+    );
+    this.router.post(
+      `${this.path}/reset`,
+      this.userController.resetUser,
     );
     this.router.delete(`${this.path}/:id`, this.userController.deleteUser);
   }

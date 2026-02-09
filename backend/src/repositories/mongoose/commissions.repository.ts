@@ -10,6 +10,7 @@ export interface ICommissionsRepository {
   findByProviderId(providerId: string, status?: CommissionStatus): Promise<Commission[]>;
   update(id: string, commission: Commission): Promise<Commission | undefined>;
   findByUserId(userId: string): Promise<Commission[]>;
+  findAllByUserId(userId: string): Promise<Commission[]>;
 }
 
 @singleton()
@@ -73,6 +74,16 @@ export class MongooseCommissionsRepository implements ICommissionsRepository {
     return commissions.map(commission => Commission.fromPersistence(this.mapToPersistence(commission)));
   }
 
+  async findAllByUserId(userId: string): Promise<Commission[]> {
+    const commissions = await CommissionModel.find({
+      $or: [{ requesterId: userId }, { providerId: userId }],
+    })
+      .sort({ createdAt: -1 })
+      .lean();
+    
+    return commissions.map(commission => Commission.fromPersistence(this.mapToPersistence(commission)));
+  }
+
   private mapToPersistence(mongooseDoc: any): CommissionPersistenceData {
     return {
       id: mongooseDoc._id || mongooseDoc.id,
@@ -83,6 +94,10 @@ export class MongooseCommissionsRepository implements ICommissionsRepository {
       status: mongooseDoc.status,
       price: mongooseDoc.price,
       deadline: mongooseDoc.deadline,
+      referenceImages: mongooseDoc.referenceImages,
+      finalArtwork: mongooseDoc.finalArtwork,
+      finalArtworkHash: mongooseDoc.finalArtworkHash,
+      escrowAddress: mongooseDoc.escrowAddress,
       startedAt: mongooseDoc.startedAt,
       completedAt: mongooseDoc.completedAt,
       cancelledAt: mongooseDoc.cancelledAt,
