@@ -222,7 +222,7 @@ export const ERC20ABI = [
   },
 ];
 
-// NFT (ERC721) 常用函数
+// NFT (ERC721) Common Functions
 export const NFTABI = [
   {
     constant: false,

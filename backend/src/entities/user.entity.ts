@@ -100,23 +100,14 @@ export class User {
     };
   }
 
-  updateProfile(data: { role?: string; name?: string; bio?: string; walletAddress?: string }) {
-    if (data.role) this._role = data.role;
-    if (data.name) this._name = data.name;
-    if (data.bio) this._bio = data.bio;
-    if (data.walletAddress) this._walletAddress = data.walletAddress;
-    this._updatedAt = new Date();
-  }
-
-
-  // 비즈니스 로직 - 이메일 변경
+  // Business Logic - Change Email
   async changeEmail(newEmail: string): Promise<void> {
     const validatedEmail = User.validateEmail(newEmail);
     this._email = validatedEmail;
     this._updatedAt = new Date();
   }
 
-  // 비즈니스 로직 - 패스워드 변경
+  // Business Logic - Change Password
   async changePassword(newPassword: string): Promise<void> {
     User.validatePassword(newPassword);
     const hashedPassword = await User.hashPassword(newPassword);
@@ -124,12 +115,13 @@ export class User {
     this._updatedAt = new Date();
   }
 
-  // 패스워드 검증
+  // Verify Password
   async verifyPassword(inputPassword: string): Promise<boolean> {
+    if (!this._password) return false;
     return compare(inputPassword, this._password);
   }
 
-  // 도메인 규칙 - 이메일 검증
+  // Domain Rule - Validate Email
   private static validateEmail(email: string): string {
     if (!email || typeof email !== 'string') {
       throw new Error('Email is required');
@@ -153,7 +145,7 @@ export class User {
     return trimmedEmail.toLowerCase();
   }
 
-  // 도메인 규칙 - 패스워드 검증
+  // Domain Rule - Validate Password
   private static validatePassword(password: string): void {
     if (!password || typeof password !== 'string') {
       throw new Error('Password is required');
@@ -167,7 +159,7 @@ export class User {
       throw new Error('Password is too long (max 128 characters)');
     }
 
-    // 최소 하나의 숫자와 하나의 문자 포함
+    // Must contain at least one number and one letter
     const hasNumber = /\d/.test(password);
     const hasLetter = /[a-zA-Z]/.test(password);
 
@@ -176,36 +168,55 @@ export class User {
     }
   }
 
-  // 패스워드 해싱
+  // Hash Password
   private static async hashPassword(password: string): Promise<string> {
     User.validatePassword(password);
-    return hash(password, 12); // 보안 강화를 위해 12 rounds 사용
+    return hash(password, 12); // Use 12 rounds for enhanced security
   }
 
-  // ID 생성
+  // Generate ID
   private static generateId(): string {
     return crypto.randomUUID();
   }
 
-  // Getter들 - 외부에서 직접 수정 불가능
+  // Getters - Immutable from outside
   get id(): string {
     return this._id;
   }
-  get email(): string {
+  get email(): string | undefined {
     return this._email;
   }
-  get password(): string {
+  get password(): string | undefined {
     return this._password;
+  }
+  get role(): string | undefined {
+    return this._role;
+  }
+  get name(): string | undefined {
+    return this._name;
+  }
+  get bio(): string | undefined {
+    return this._bio;
+  }
+  get walletAddress(): string | undefined {
+    return this._walletAddress;
   }
   get createdAt(): Date {
     return new Date(this._createdAt);
-  } // 방어적 복사
+  } // Defensive copy
   get updatedAt(): Date {
     return new Date(this._updatedAt);
-  } // 방어적 복사
+  } // Defensive copy
 
-  // 도메인 메서드 - 사용자 정보 업데이트
-  async updateProfile(data: { email?: string; password?: string }): Promise<void> {
+  // Domain Method - Update User Info
+  async updateProfile(data: { 
+    email?: string; 
+    password?: string;
+    role?: string; 
+    name?: string; 
+    bio?: string; 
+    walletAddress?: string;
+  }): Promise<void> {
     let hasChanges = false;
 
     if (data.email && data.email !== this._email) {
@@ -218,38 +229,32 @@ export class User {
       hasChanges = true;
     }
 
+    if (data.role && data.role !== this._role) {
+      this._role = data.role;
+      hasChanges = true;
+    }
+
+    if (data.name && data.name !== this._name) {
+      this._name = data.name;
+      hasChanges = true;
+    }
+
+    if (data.bio && data.bio !== this._bio) {
+      this._bio = data.bio;
+      hasChanges = true;
+    }
+
+    if (data.walletAddress && data.walletAddress !== this._walletAddress) {
+      this._walletAddress = data.walletAddress;
+      hasChanges = true;
+    }
+
     if (hasChanges) {
       this._updatedAt = new Date();
     }
   }
 
-  // 영속성을 위한 직렬화
-  toPersistence(): UserPersistenceData {
-    return {
-      id: this._id,
-      email: this._email,
-      password: this._password,
-      createdAt: this._createdAt,
-      updatedAt: this._updatedAt,
-    };
-  }
-
-  // API 응답용 직렬화 (패스워드 제외)
-  toResponse(): {
-    id: string;
-    email: string;
-    createdAt: Date;
-    updatedAt: Date;
-  } {
-    return {
-      id: this._id,
-      email: this._email,
-      createdAt: this._createdAt,
-      updatedAt: this._updatedAt,
-    };
-  }
-
-  // 동등성 비교
+  // Equality Comparison
   equals(other: User): boolean {
     return this._id === other._id;
   }

@@ -6,13 +6,14 @@ import { useAccount } from '@particle-network/connectkit';
 export function useAuthCheck() {
   const navigate = useNavigate();
   const { isConnected, address } = useAccount();
+  const apiEndpoint = process.env.API_SERVER_URL as string;
 
   useEffect(() => {
     const checkUserProfile = async () => {
       if (!isConnected || !address) return;
 
       try {
-        const response = await fetch(`/api/v1/users/${address}`);
+        const response = await fetch(apiEndpoint+`/api/v1/users/${address}`);
         if (response.status === 404) {
           // User doesn't exist, redirect to profile setup
           navigate('/profile/setup');

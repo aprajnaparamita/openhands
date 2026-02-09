@@ -10,6 +10,8 @@ export default function ProfileSetup() {
   const [name, setName] = useState('');
   const [bio, setBio] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const apiEndpoint = process.env.REACT_APP_API_SERVER_URL as string;
+  const apiPrefix = process.env.REACT_APP_API_PREFIX as string;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -21,8 +23,10 @@ export default function ProfileSetup() {
     setIsSubmitting(true);
     try {
       console.log('Sending profile data:', { role, name, bio, address });
-      
-      const response = await fetch(`/api/v1/users/${address}`, {
+      console.log('PUTing to', apiEndpoint+apiPrefix+`/users/${address}`);
+      console.log('apiEndpoint', apiEndpoint);
+      console.log('apiPrefix', apiPrefix);
+      const response = await fetch(apiEndpoint+apiPrefix+`/users/${address}`, {
         method: 'PUT',
         headers: { 
           'Content-Type': 'application/json',

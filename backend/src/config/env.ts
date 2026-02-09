@@ -4,9 +4,9 @@ import { resolve } from 'path';
 import { z } from 'zod';
 
 /**
- * 1) dotenv 로드 순서
- *    - .env (공통)
- *    - .env.{NODE_ENV}.local (환경별 override, 있으면 덮어씀)
+ * 1) dotenv load order
+ *    - .env (Common)
+ *    - .env.{NODE_ENV}.local (Environment override, overwrites if exists)
  */
 config(); // .env
 const nodeEnv = process.env.NODE_ENV || 'development';
@@ -16,22 +16,22 @@ if (existsSync(layerPath)) {
 }
 
 /**
- * 2) Zod 스키마 정의
- *    - 필수/선택/기본값 정책은 필요에 맞게 수정 가능
+ * 2) Zod Schema Definition
+ *    - Required/Optional/Default policies can be modified as needed
  */
 const EnvSchema = z
   .object({
     NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
-    PORT: z.coerce.number().int().positive().optional(), // 기본값은 app.ts에서 3000 처리
+    PORT: z.coerce.number().int().positive().optional(), // Default is handled as 3000 in app.ts
 
     SECRET_KEY: z.string().min(1),
 
-    LOG_FORMAT: z.string().min(1).optional(), // 기본값은 app.ts에서 'dev'
+    LOG_FORMAT: z.string().min(1).optional(), // Default is 'dev' in app.ts
     LOG_DIR: z.string().min(1),
     LOG_LEVEL: z.string().min(1),
 
-    ORIGIN: z.string().min(1), // 필요시 배열화 가능
-    CREDENTIALS: z.coerce.boolean(), // 'true'/'false' 문자열 → boolean
+    ORIGIN: z.string().min(1), // Can be made into an array if needed
+    CREDENTIALS: z.coerce.boolean(), // 'true'/'false' string → boolean
     CORS_ORIGINS: z.string().optional(), // "http://a.com,http://b.com"
 
     API_SERVER_URL: z.string().url().optional(),
@@ -42,7 +42,7 @@ const EnvSchema = z
   .strip();
 
 /**
- * 3) 검증(모듈 import 시점에 실행)
+ * 3) Validation (Executed at module import time)
  */
 const parsed = EnvSchema.safeParse(process.env);
 if (!parsed.success) {
@@ -53,14 +53,14 @@ if (!parsed.success) {
 const env = parsed.data;
 
 /**
- * 4) 타입 안전한 상수 export
- *    - 다른 파일에서는 process.env 직접 쓰지 말고 여기서만 가져가세요.
+ * 4) Type-safe constant export
+ *    - Do not use process.env directly in other files, import from here.
  */
 export const NODE_ENV = env.NODE_ENV;
-export const PORT = env.PORT; // app.ts에서 PORT || 3000
+export const PORT = env.PORT; // PORT || 3000 in app.ts
 export const SECRET_KEY = env.SECRET_KEY;
 
-export const LOG_FORMAT = env.LOG_FORMAT; // app.ts에서 LOG_FORMAT || 'dev'
+export const LOG_FORMAT = env.LOG_FORMAT; // LOG_FORMAT || 'dev' in app.ts
 export const LOG_DIR = env.LOG_DIR;
 export const LOG_LEVEL = env.LOG_LEVEL;
 
@@ -71,7 +71,7 @@ export const SENTRY_DSN = env.SENTRY_DSN;
 export const REDIS_URL = env.REDIS_URL;
 export const API_SERVER_URL = env.API_SERVER_URL;
 
-// CORS Origins를 배열로도 제공 (없으면 [])
+// Provide CORS Origins as an array (empty if none)
 export const CORS_ORIGIN_LIST =
   env.CORS_ORIGINS?.split(',')
     .map((s) => s.trim())

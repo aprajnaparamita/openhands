@@ -33,7 +33,7 @@ export class AuthController {
       httpOnly: true,
       path: '/',
       sameSite: 'lax',
-      // secure: true, // 프로덕션에서 HTTPS일 때만
+      // secure: true, // Only when using HTTPS in production
     });
     res.status(200).json({ message: 'logout' });
   });

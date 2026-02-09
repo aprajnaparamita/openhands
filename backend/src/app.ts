@@ -47,7 +47,7 @@ class App {
   }
 
   private initializeTrustProxy() {
-    // Nginx, Heroku, Cloudflare 등 프록시 환경에서 실IP 추출을 위해 필요
+    // Required to extract real IP in proxy environments like Nginx, Heroku, Cloudflare
     this.app.set('trust proxy', 1);
   }
 
@@ -66,9 +66,9 @@ class App {
 
     this.app.use(morgan(LOG_FORMAT || 'dev', { stream }));
 
-    // CORS 화이트리스트를 환경변수에서 관리
+    // Manage CORS whitelist in environment variables
     const allowedOrigins =
-      CORS_ORIGIN_LIST.length > 0 ? CORS_ORIGIN_LIST : ['http://localhost:3000'];
+      CORS_ORIGIN_LIST.length > 0 ? CORS_ORIGIN_LIST : ['http://localhost:3001'];
 
     this.app.use(
       cors({
@@ -96,7 +96,7 @@ class App {
                 upgradeInsecureRequests: [],
               },
             }
-            : false, // 개발 환경에서는 CSP 비활성화 (hot reload 등 편의)
+            : false, // Disable CSP in development environment (for hot reload convenience etc.)
         referrerPolicy: { policy: 'no-referrer' },
       }),
     );

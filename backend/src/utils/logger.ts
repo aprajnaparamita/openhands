@@ -3,16 +3,16 @@ import { join } from 'path';
 import pino from 'pino';
 import { LOG_DIR, LOG_LEVEL, NODE_ENV } from '@config/env';
 
-// 로그 환경 설정
+// Log Environment Configuration
 const isProd = NODE_ENV === 'production';
 const logRoot = LOG_DIR || 'logs';
 const logLevel = LOG_LEVEL || 'info';
 
-// 현재 런타임 위치(프로젝트 실행 디렉토리)에 logs 폴더 생성
-const projectRoot = process.cwd(); // 현재 프로세스 실행 디렉토리
+// Create logs folder in the current runtime location (project execution directory)
+const projectRoot = process.cwd(); // Current process execution directory
 const logDir = join(projectRoot, logRoot);
 
-// 로그 디렉토리 생성 (에러 핸들링 포함)
+// Create log directory (includes error handling)
 try {
   if (!existsSync(logDir)) {
     mkdirSync(logDir, { recursive: true });
@@ -25,32 +25,32 @@ try {
   throw error;
 }
 
-// 파일 로깅용 경로
+// Path for file logging
 const prodFile = join(logDir, 'app');
 const devFile = join(logDir, 'app.dev');
 const errorFile = join(logDir, 'error');
 
-// Pino 인스턴스
+// Pino Instance
 const transport = pino.transport({
   targets: isProd
     ? [
-        // prod: 일자/용량 기반 롤링 + 30일 보관 (전체 로그)
+        // prod: Date/Size based rolling + 30 days retention (all logs)
         {
           target: 'pino-roll',
           level: logLevel,
           options: {
-            file: prodFile, // 최종 파일: app.2025-08-29.log 등
+            file: prodFile, // Final file: app.2025-08-29.log etc.
             frequency: 'daily', // 'daily' | 'hourly' | number(ms)
-            size: '50m', // 용량 기준 분할
+            size: '50m', // Split by size
             dateFormat: 'yyyy-MM-dd',
             extension: '.log',
             mkdir: true,
-            symlink: true, // current.log 심볼릭 링크 생성
-            limit: { count: 30 }, // 30개 보관
-            // limit: { count: 30, removeOtherLogFiles: false }, // PM2/클러스터면 주의
+            symlink: true, // Create symbolic link for current.log
+            limit: { count: 30 }, // Keep 30
+            // limit: { count: 30, removeOtherLogFiles: false }, // Caution with PM2/Cluster
           },
         },
-        // prod: 에러 전용 파일 (보관 60일 등 별도 정책 가능)
+        // prod: Error-only file (separate policy like 60 days retention possible)
         {
           target: 'pino-roll',
           level: 'error',
@@ -67,7 +67,7 @@ const transport = pino.transport({
         },
       ]
     : [
-        // dev: 예쁜 콘솔 출력
+        // dev: Pretty console output
         {
           target: 'pino-pretty',
           level: logLevel,
@@ -77,7 +77,7 @@ const transport = pino.transport({
             ignore: 'pid,hostname',
           },
         },
-        // dev: 파일도 같이 굴리고 싶다면(선택) — 필요 없으면 이 블록을 지워도 됨
+        // dev: If you want to roll files as well (optional) — delete this block if not needed
         {
           target: 'pino-roll',
           level: logLevel,
@@ -95,7 +95,7 @@ const transport = pino.transport({
       ],
 });
 
-// ── Logger 인스턴스
+// ── Logger Instance
 export const logger = pino(
   {
     level: logLevel,

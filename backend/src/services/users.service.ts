@@ -19,21 +19,47 @@ export class UsersService {
   }
 
   async createUser(userData: UserCreateData): Promise<User> {
-    // Entity에서 이메일 중복 검사를 위해 먼저 확인
-    const exists = await this.usersRepository.findByEmail(userData.email);
-    if (exists) throw new HttpException(409, 'Email already exists');
+    // Check email existence only if email is provided
+    if (userData.email) {
+      const exists = await this.usersRepository.findByEmail(userData.email);
+      if (exists) throw new HttpException(409, 'Email already exists');
+    }
+    
+    if (userData.walletAddress) {
+      const exists = await this.usersRepository.findByWalletAddress(userData.walletAddress);
+      if (exists) return exists; // Idempotency for wallet login
+    }
 
-    // Entity 클래스의 팩토리 메서드로 생성 (모든 검증이 자동 처리됨)
+    // Create using the factory method of the Entity class (all validation is handled automatically)
     const user = await User.create(userData);
     await this.usersRepository.save(user);
     return user;
   }
 
-  async updateUser(id: string, updateData: { email?: string; password?: string }): Promise<User> {
-    const existingUser = await this.usersRepository.findById(id);
-    if (!existingUser) throw new HttpException(404, 'User not found');
+  async updateUser(id: string, updateData: { email?: string; password?: string; role?: string; name?: string; bio?: string; walletAddress?: string }): Promise<User> {
+    let existingUser: User | undefined;
+    
+    if (id.startsWith('0x') || id.length > 30) {
+      existingUser = await this.usersRepository.findByWalletAddress(id);
+    }
+    
+    if (!existingUser) {
+      existingUser = await this.usersRepository.findById(id);
+    }
 
-    // Entity의 도메인 메서드를 사용하여 업데이트
+    if (!existingUser) {
+      // For wallet users, we might want to create on update if they don't exist yet
+      // But usually create should happen first. 
+      // However, the frontend flow tries to PUT to /users/:address for profile setup.
+      // If user doesn't exist, we should create them.
+      if (updateData.walletAddress) {
+        return this.createUser(updateData);
+      }
+      throw new HttpException(404, 'User not found');
+    }
+
+    // Update using the domain method of the Entity
+    // Handle specific updates
     if (updateData.email) await existingUser.changeEmail(updateData.email);
     if (updateData.password) await existingUser.changePassword(updateData.password);
 

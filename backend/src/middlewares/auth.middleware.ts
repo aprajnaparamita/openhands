@@ -37,7 +37,7 @@ export const AuthMiddleware = async (req: Request, res: Response, next: NextFunc
       return next(new HttpException(401, 'Authentication failed'));
     }
 
-    // 타입 일치 유의 (number/string)
+    // Note type matching (number/string)
     const userRepo = container.resolve(UsersRepository);
     const findUser = await userRepo.findById(String(payload.id));
     if (!findUser) return next(new HttpException(401, 'User not found with this token'));

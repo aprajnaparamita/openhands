@@ -35,7 +35,7 @@ export class AuthService {
     const findUser = await this.usersRepository.findByEmail(userData.email);
     if (findUser) throw new HttpException(409, `Email is already in use`);
 
-    // Entity 클래스의 팩토리 메서드로 생성 (모든 검증이 자동 처리됨)
+    // Create using the factory method of the Entity class (all validation is handled automatically)
     const newUser = await User.create(userData);
     await this.usersRepository.save(newUser);
     return newUser;
@@ -48,7 +48,7 @@ export class AuthService {
     const findUser = await this.usersRepository.findByEmail(loginData.email);
     if (!findUser) throw new HttpException(401, `Invalid email or password.`);
 
-    // Entity의 도메인 메서드로 패스워드 검증
+    // Password verification using the domain method of the Entity
     const isPasswordMatching = await findUser.verifyPassword(loginData.password);
     if (!isPasswordMatching) throw new HttpException(401, 'Password is incorrect');
 
@@ -59,8 +59,8 @@ export class AuthService {
   }
 
   public async logout(user: User): Promise<void> {
-    // 로그아웃은 실제 서비스에서는 서버에서 세션/리프레시토큰을 블랙리스트 처리 등 구현 가능
-    // 여기서는 클라이언트의 쿠키를 삭제하면 충분
+    // In a real service, logout can be implemented by blacklisting the session/refresh token on the server
+    // Here, deleting the client's cookie is sufficient
     console.log(`User with email ${user.email} logged out.`);
 
     return;

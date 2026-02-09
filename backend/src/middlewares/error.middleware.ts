@@ -21,12 +21,12 @@ interface ErrorResponseBody {
   error: ErrorDetails;
 }
 
-/** 타입가드들 */
+/** Type Guards */
 const isZodError = (e: unknown): e is ZodError => {
   return e instanceof ZodError;
 };
 
-/** jsonwebtoken은 런타임에 따라 클래스 경계 이슈가 있을 수 있어 name 기반 가드 권장 */
+/** jsonwebtoken may have class boundary issues depending on runtime, so name-based guard is recommended */
 const isTokenExpiredError = (e: unknown): e is TokenExpiredError => {
   return e instanceof Error && (e as any).name === 'TokenExpiredError';
 };
