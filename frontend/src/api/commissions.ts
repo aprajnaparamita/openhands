@@ -1,12 +1,5 @@
-import axios from 'axios';
+import { api } from './client';
 import { CreateCommissionData, Commission } from '../types/commission';
-
-const API_URL = `${process.env.REACT_APP_API_SERVER_URL || 'http://localhost:3000'}${process.env.REACT_APP_API_PREFIX || '/api/v1'}`;
-
-const api = axios.create({
-  baseURL: API_URL,
-  withCredentials: true,
-});
 
 export const commissionApi = {
   create: async (data: CreateCommissionData): Promise<Commission> => {

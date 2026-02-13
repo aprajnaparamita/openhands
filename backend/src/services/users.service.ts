@@ -54,7 +54,13 @@ export class UsersService {
   async createUser(userData: UserCreateData): Promise<User> {
     if (userData.walletAddress) {
       const exists = await this.usersRepository.findByWalletAddress(userData.walletAddress);
-      if (exists) return exists; // Idempotency for wallet login
+      if (exists) {
+        console.log(`[UsersService] createUser: User with wallet ${userData.walletAddress} already exists. Updating...`);
+        // If user exists, we treat this as an update to ensure profile data is saved
+        await exists.updateProfile(userData);
+        await this.usersRepository.update(exists.id, exists);
+        return exists;
+      }
     }
 
     // Create using the factory method of the Entity class (all validation is handled automatically)
@@ -72,6 +78,7 @@ export class UsersService {
     headerImage?: string;
     portfolio?: string[];
   }): Promise<User> {
+    console.log(`[UsersService] updateUser: Updating user ${id}`, updateData);
     let existingUser: User | undefined;
     
     if (id.startsWith('0x') || id.length > 30) {
@@ -83,6 +90,7 @@ export class UsersService {
     }
 
     if (!existingUser) {
+      console.log(`[UsersService] updateUser: User ${id} not found. Attempting create.`);
       // For wallet users, we might want to create on update if they don't exist yet
       // But usually create should happen first. 
       // However, the frontend flow tries to PUT to /users/:address for profile setup.

@@ -29,21 +29,28 @@ export class MongooseUsersRepository implements IUsersRepository {
 
   async save(user: User): Promise<User> {
     const persistenceData = user.toPersistence();
+    console.log('[MongooseUsersRepository] save: Saving user', JSON.stringify(persistenceData, null, 2));
     const userDoc = new UserModel({
       _id: persistenceData.id,
       ...persistenceData,
     });
     await userDoc.save();
+    console.log('[MongooseUsersRepository] save: User saved successfully');
     return user;
   }
 
   async update(id: string, user: User): Promise<User | undefined> {
     const persistenceData = user.toPersistence();
+    console.log(`[MongooseUsersRepository] update: Updating user ${id}`, JSON.stringify(persistenceData, null, 2));
     const updated = await UserModel.findByIdAndUpdate(
       id,
       { ...persistenceData, updatedAt: new Date() },
       { new: true, lean: true }
     );
+    console.log('[MongooseUsersRepository] update: Update result:', updated ? 'Success' : 'Not Found');
+    if (updated) {
+       console.log('[MongooseUsersRepository] update: Updated doc:', JSON.stringify(updated, null, 2));
+    }
     return updated ? User.fromPersistence(this.mapToPersistence(updated)) : undefined;
   }
 
@@ -86,8 +93,6 @@ export class MongooseUsersRepository implements IUsersRepository {
   private mapToPersistence(mongooseDoc: any): UserPersistenceData {
     return {
       id: mongooseDoc._id || mongooseDoc.id,
-      email: mongooseDoc.email,
-      password: mongooseDoc.password,
       walletAddress: mongooseDoc.walletAddress,
       role: mongooseDoc.role,
       name: mongooseDoc.name,

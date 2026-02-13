@@ -1,11 +1,4 @@
-import axios from 'axios';
-
-const API_URL = `${process.env.REACT_APP_API_SERVER_URL || 'http://localhost:3000'}${process.env.REACT_APP_API_PREFIX || '/api/v1'}`;
-
-const api = axios.create({
-  baseURL: API_URL,
-  withCredentials: true,
-});
+import { api } from './client';
 
 export const userApi = {
   getProfile: async (userId: string) => {

@@ -1,6 +1,7 @@
 // src/infrastructure/mongoose/schemas/commission.schema.ts
 import mongoose, { Schema } from 'mongoose';
-import { CommissionStatus } from '@entities/commission.entity';
+import { CommissionStatus } from '../../../entities/commission.entity.js';
+import crypto from 'crypto';
 
 const commissionSchema = new Schema(
   {
@@ -81,7 +82,7 @@ const commissionSchema = new Schema(
   {
     timestamps: true,
     toJSON: {
-      transform: (_, ret) => {
+      transform: (_, ret: any) => {
         ret.id = ret._id;
         delete ret._id;
         delete ret.__v;

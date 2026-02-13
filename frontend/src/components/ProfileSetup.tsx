@@ -46,10 +46,15 @@ export default function ProfileSetup() {
     }
 
     setIsSubmitting(true);
+    const url = `${apiEndpoint}${apiPrefix}/users/${address}`;
+    console.log(`[ProfileSetup] Starting profile update...`);
+    console.log(`[ProfileSetup] PUT URL: ${url}`);
+    console.log(`[ProfileSetup] Payload:`, { role, name, bio, address });
+
     try {
       // Use axios or standard fetch but we must handle credentials if we rely on cookies
       // The current fetch implementation does not include credentials
-      const response = await fetch(apiEndpoint+apiPrefix+`/users/${address}`, {
+      const response = await fetch(url, {
         method: 'PUT',
         headers: { 
           'Content-Type': 'application/json',
@@ -65,28 +70,30 @@ export default function ProfileSetup() {
         }),
       });
 
+      console.log(`[ProfileSetup] Response Status: ${response.status} ${response.statusText}`);
       const responseData = await response.json().catch(() => ({}));
+      console.log(`[ProfileSetup] Response Data:`, responseData);
       
       if (!response.ok) {
+        console.error(`[ProfileSetup] Request failed with status ${response.status}`);
         throw new Error(responseData.message || 'Failed to save profile');
       }
 
-      console.log('Profile saved successfully:', responseData);
+      console.log('[ProfileSetup] Profile saved successfully. Initiating navigation to /dashboard...');
       
       // Force a short delay or state update before navigation to ensure cookie is set
       // and useAuthCheck has time to re-run if needed
       setTimeout(() => {
+        console.log('[ProfileSetup] Navigating now.');
         navigate('/dashboard');
       }, 500);
       
     } catch (error) {
-      navigate('/dashboard');
-      console.error('Error details:', {
+      console.error('[ProfileSetup] Error details:', {
         error,
         message: error instanceof Error ? error.message : 'Unknown error',
         stack: error instanceof Error ? error.stack : undefined
       });
-      // You might want to show this error to the user
       alert(`Failed to save profile: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setIsSubmitting(false);

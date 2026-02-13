@@ -36,6 +36,7 @@ const EnvSchema = z
 
     API_SERVER_URL: z.string().url().optional(),
 
+    MONGO_URI: z.string().url().default('mongodb://localhost:27017/openhands'),
     SENTRY_DSN: z.string().default(''),
     REDIS_URL: z.string().url().default('redis://localhost:6379'),
 
@@ -81,6 +82,7 @@ export const CREDENTIALS = env.CREDENTIALS;
 export const SENTRY_DSN = env.SENTRY_DSN;
 export const REDIS_URL = env.REDIS_URL;
 export const API_SERVER_URL = env.API_SERVER_URL;
+export const MONGO_URI = env.MONGO_URI;
 
 export const CLOUDINARY_CLOUD_NAME = env.CLOUDINARY_CLOUD_NAME;
 export const CLOUDINARY_API_KEY = env.CLOUDINARY_API_KEY;

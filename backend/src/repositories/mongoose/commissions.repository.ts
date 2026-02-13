@@ -1,7 +1,7 @@
 // src/repositories/mongoose/commissions.repository.ts
 import { singleton } from 'tsyringe';
-import { Commission, CommissionPersistenceData, CommissionStatus } from '@entities/commission.entity';
-import { CommissionModel } from '@infrastructure/mongoose/schemas/commission.schema';
+import { Commission, CommissionPersistenceData, CommissionStatus } from '../../entities/commission.entity.js';
+import { CommissionModel } from '../../infrastructure/mongoose/schemas/commission.schema.js';
 
 export interface ICommissionsRepository {
   save(commission: Commission): Promise<Commission>;
