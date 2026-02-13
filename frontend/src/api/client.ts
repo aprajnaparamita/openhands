@@ -25,7 +25,28 @@ api.interceptors.response.use(
     console.log(`[API Response] ${response.status} ${response.config.url}`, response.data);
     return response;
   },
-  (error) => {
+  async (error) => {
+    const originalRequest = error.config;
+
+    // Check if error is 401 and we haven't retried yet
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      // Avoid infinite loop if refresh endpoint itself fails
+      if (originalRequest.url.includes('/auth/refresh')) {
+        return Promise.reject(error);
+      }
+
+      originalRequest._retry = true;
+      try {
+        console.log('[API] Token expired. Attempting refresh...');
+        await api.post('/auth/refresh');
+        console.log('[API] Refresh successful. Retrying original request...');
+        return api(originalRequest);
+      } catch (refreshError) {
+        console.error('[API] Refresh token failed', refreshError);
+        return Promise.reject(refreshError);
+      }
+    }
+
     if (error.response) {
       // The request was made and the server responded with a status code
       // that falls out of the range of 2xx

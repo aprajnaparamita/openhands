@@ -25,13 +25,15 @@ export class UsersRoute implements Routes {
     );
     this.router.put(
       `${this.path}/:id`,
+      AuthMiddleware,
       ValidationMiddleware(updateUserSchema),
       this.userController.updateUser,
     );
     this.router.post(
       `${this.path}/reset`,
+      AuthMiddleware,
       this.userController.resetUser,
     );
-    this.router.delete(`${this.path}/:id`, this.userController.deleteUser);
+    this.router.delete(`${this.path}/:id`, AuthMiddleware, this.userController.deleteUser);
   }
 }

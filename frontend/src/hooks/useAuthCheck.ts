@@ -1,74 +1,81 @@
 // src/hooks/useAuthCheck.ts
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAccount } from '@particle-network/connectkit';
+import { api } from '../api/client';
 
 export function useAuthCheck() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { isConnected, address } = useAccount();
-  const apiEndpoint = process.env.REACT_APP_API_SERVER_URL as string;
-  const apiPrefix = process.env.REACT_APP_API_PREFIX as string;
 
   useEffect(() => {
     const checkUserProfile = async () => {
-      if (!isConnected || !address) {
-        console.log('[useAuthCheck] Not connected or no address. Skipping check.');
-        return;
-      }
-
-      const url = `${apiEndpoint}${apiPrefix}/users/${address}`;
-      console.log(`[useAuthCheck] Checking profile for ${address} at ${url}`);
-
+      // Avoid redirect loops by checking current path
+      const currentPath = location.pathname;
+      const isPublicPath = ['/', '/reset'].includes(currentPath);
+      const isProfileSetup = currentPath === '/profile/setup';
+      
       try {
-        const response = await fetch(url);
-        console.log(`[useAuthCheck] Response status: ${response.status}`);
-        
-        // Handle 404 (User Not Found)
-        if (response.status === 404) {
-          console.log('[useAuthCheck] User not found (404). Checking if redirect needed...');
-          // If we are NOT on setup/reset, go to setup
-          if (window.location.pathname !== '/profile/setup' && window.location.pathname !== '/reset') {
-            console.log('[useAuthCheck] Redirecting to /profile/setup');
-            navigate('/profile/setup');
+        // Step 1: Check existing session via Cookie
+        console.log('[useAuthCheck] Checking existing session...');
+        let userData;
+        try {
+          const meResponse = await api.get('/auth/me');
+          userData = meResponse.data.data;
+          console.log('[useAuthCheck] Session valid:', userData);
+        } catch (error) {
+          console.log('[useAuthCheck] No valid session found.');
+        }
+
+        // Step 2: If no session but wallet connected, try to login
+        if (!userData && isConnected && address) {
+          console.log(`[useAuthCheck] Logging in with wallet ${address}...`);
+          try {
+            const loginResponse = await api.post('/auth/wallet', { walletAddress: address });
+            userData = loginResponse.data.data;
+            console.log('[useAuthCheck] Login successful:', userData);
+          } catch (error) {
+            console.error('[useAuthCheck] Login failed:', error);
+            return; // Stop if login fails
+          }
+        }
+
+        if (!userData) {
+          // No session and no wallet connected.
+          // If on a protected route, redirect to home.
+          // For now, only /profile/* and /dashboard are protected?
+          if (!isPublicPath) {
+             // navigate('/'); // Optional: Redirect to home if not auth
           }
           return;
         }
 
-        // Handle Success
-        if (response.ok) {
-          const userData = await response.json();
-          console.log('[useAuthCheck] User data received:', userData);
-          const hasRole = !!userData.data?.role;
-          console.log(`[useAuthCheck] Has role? ${hasRole}`);
-          
-          // Case 1: Incomplete Profile (No Role)
-          if (!hasRole) {
-            console.log('[useAuthCheck] Profile incomplete. Redirecting to setup if needed.');
-            // Redirect to setup if not already there
-            if (window.location.pathname !== '/profile/setup' && window.location.pathname !== '/reset') {
-              navigate('/profile/setup');
-            }
-          } 
-          // Case 2: Complete Profile (Has Role)
-          else {
-            console.log('[useAuthCheck] Profile complete.');
-            // Redirect to dashboard if currently on landing or setup
-            if (window.location.pathname === '/' || window.location.pathname === '/profile/setup') {
-              console.log('[useAuthCheck] Redirecting to /dashboard');
-              navigate('/dashboard');
-            }
+        // Step 3: Check Role and Redirect
+        const hasRole = !!userData?.role;
+        console.log(`[useAuthCheck] Has role? ${hasRole}`);
+
+        if (!hasRole) {
+          // User needs to set up profile
+          if (!isProfileSetup && currentPath !== '/reset') {
+            console.log('[useAuthCheck] Profile incomplete. Redirecting to /profile/setup');
+            navigate('/profile/setup');
           }
         } else {
-          console.warn(`[useAuthCheck] Unexpected status: ${response.status}`);
+          // User has profile
+          if (isProfileSetup || currentPath === '/') {
+            console.log('[useAuthCheck] Profile complete. Redirecting to /dashboard');
+            navigate('/dashboard');
+          }
         }
+
       } catch (error) {
         console.error('[useAuthCheck] Error checking user profile:', error);
-        // Do NOT redirect on network error to avoid loops
       }
     };
 
     checkUserProfile();
-  }, [isConnected, address, navigate]);
+  }, [isConnected, address, navigate, location.pathname]);
 
   return { isConnected, address };
 }

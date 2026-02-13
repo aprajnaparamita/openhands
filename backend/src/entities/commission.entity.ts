@@ -30,7 +30,7 @@ export interface CommissionPersistenceData {
   startedAt?: Date;
   completedAt?: Date;
   cancelledAt?: Date;
-  ratingId?: string;
+  ratingId?: string | { score: number; review: string };
   createdAt: Date;
   updatedAt: Date;
 }
@@ -52,7 +52,7 @@ export class Commission {
     private _startedAt?: Date,
     private _completedAt?: Date,
     private _cancelledAt?: Date,
-    private _ratingId?: string,
+    private _ratingId?: string | { score: number; review: string },
     private readonly _createdAt: Date = new Date(),
     private _updatedAt: Date = new Date()
   ) {}
@@ -202,7 +202,7 @@ export class Commission {
     };
   }
   get cancelledAt(): Date | undefined { return this._cancelledAt ? new Date(this._cancelledAt) : undefined; }
-  get ratingId(): string | undefined { return this._ratingId; }
+  get ratingId(): string | { score: number; review: string } | undefined { return this._ratingId; }
   get createdAt(): Date { return new Date(this._createdAt); }
   get updatedAt(): Date { return new Date(this._updatedAt); }
 

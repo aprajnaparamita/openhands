@@ -21,8 +21,16 @@ mongoose.connect(MONGO_URI)
 
 // DI Registration
 // Use Mongoose repository instead of in-memory
-container.register(UsersRepository, { useClass: MongooseUsersRepository });
+container.register('UsersRepository', { useClass: MongooseUsersRepository });
+// Fix for TS2769: explicitly cast or use correct overload if possible. 
+// However, tsyringe allows registering a class token with a provider.
+// The error suggests that UsersRepository constructor is being treated as the options object or similar confusion.
+// Let's try to remove the class registration if we are using the string token, 
+// OR fix the class registration. 
+// If we want to replace UsersRepository injection with MongooseUsersRepository:
+// container.register(UsersRepository, { useValue: new MongooseUsersRepository() });
 container.register('CommissionsRepository', { useClass: MongooseCommissionsRepository });
+container.register(MongooseCommissionsRepository, { useClass: MongooseCommissionsRepository });
 
 // Export only the createApp function
 export const createApp = () => {

@@ -1,5 +1,3 @@
-import { compare, hash } from 'bcryptjs';
-import { CreateUserDto } from '@dtos/users.dto';
 import { User } from '@entities/user.entity';
 import { UsersRepository } from '@repositories/users.repository';
 import { AuthService } from '@services/auth.service';
@@ -13,63 +11,49 @@ describe('AuthService (with UserMemoryRepository)', () => {
     authService = new AuthService(userRepo);
   });
 
-  it('should sign up a new user', async () => {
-    const dto: CreateUserDto = {
-      email: 'newuser@example.com',
-      password: 'newpassword123',
-    };
-    const created = await authService.signup(dto);
-    expect(created.email).toBe(dto.email);
+  it('should login with a new wallet address (signup)', async () => {
+    const walletAddress = 'wallet-new';
+    
+    // loginWithWallet returns { cookie, refreshCookie, user }
+    const result = await authService.loginWithWallet(walletAddress);
+    
+    expect(result.user).toBeDefined();
+    expect(result.user.walletAddress).toBe(walletAddress);
+    expect(result.accessTokenCookie).toContain('Authorization=');
+    expect(result.refreshTokenCookie).toContain('RefreshToken=');
 
-    const found = await userRepo.findByEmail(dto.email);
+    // Verify user is saved in repo
+    const found = await userRepo.findByWalletAddress(walletAddress);
     expect(found).toBeDefined();
-    expect(await compare(dto.password, found!.password)).toBe(true);
+    expect(found?.refreshToken).toBeDefined(); // Refresh token should be hashed and saved
   });
 
-  it('should throw an error if email is already in use', async () => {
-    // First create a user
-    const existingUser = await User.create({
-      email: 'existing@example.com',
-      password: 'password123',
-    });
+  it('should login with an existing wallet address', async () => {
+    const walletAddress = 'wallet-existing';
+    // Create user first
+    const existingUser = await User.create({ walletAddress });
     await userRepo.save(existingUser);
 
-    const dto: CreateUserDto = {
-      email: 'existing@example.com',
-      password: 'anypass1',
-    };
-    await expect(authService.signup(dto)).rejects.toThrow(/already/);
+    const result = await authService.loginWithWallet(walletAddress);
+    
+    expect(result.user.id).toBe(existingUser.id);
+    expect(result.user.walletAddress).toBe(walletAddress);
+    
+    // Verify refresh token is updated
+    const found = await userRepo.findByWalletAddress(walletAddress);
+    expect(found?.refreshToken).not.toBe(existingUser.refreshToken);
   });
 
-  it('should return user and cookie on successful login', async () => {
-    // Create user using Entity
-    const plainPassword = 'mySecret123';
-    const email = 'loginuser@example.com';
-    const user = await User.create({ email, password: plainPassword });
+  it('should successfully logout', async () => {
+    const walletAddress = 'wallet-logout';
+    const user = await User.create({ walletAddress });
+    // Set a refresh token
+    user.setRefreshToken('some-token');
     await userRepo.save(user);
 
-    const result = await authService.login({ email, password: plainPassword });
-    expect(result.user.email).toBe(email);
-    expect(result.cookie).toContain('Authorization=');
-  });
+    await authService.logout(user);
 
-  it('should throw an error if email or password is incorrect', async () => {
-    // Non-existing email
-    await expect(
-      authService.login({ email: 'nobody@example.com', password: 'wrongpass1' }),
-    ).rejects.toThrow(/Invalid email or password/i);
-
-    // Create user and test wrong password
-    const user = await User.create({ email: 'test@example.com', password: 'correctpass1' });
-    await userRepo.save(user);
-
-    await expect(
-      authService.login({ email: 'test@example.com', password: 'wrongpass2' }),
-    ).rejects.toThrow(/password/i);
-  });
-
-  it('should successfully logout without errors', async () => {
-    const user = await User.create({ email: 'logout@example.com', password: 'password123' });
-    await expect(authService.logout(user)).resolves.toBeUndefined();
+    const found = await userRepo.findByWalletAddress(walletAddress);
+    expect(found?.refreshToken).toBeUndefined();
   });
 });

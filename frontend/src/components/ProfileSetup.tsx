@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAccount } from '@particle-network/connectkit';
+import { userApi } from '../api/users';
 
 export default function ProfileSetup() {
   const { address } = useAccount();
@@ -11,22 +12,17 @@ export default function ProfileSetup() {
   const [bio, setBio] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const apiEndpoint = process.env.REACT_APP_API_SERVER_URL as string;
-  const apiPrefix = process.env.REACT_APP_API_PREFIX as string;
 
   useEffect(() => {
     const fetchUserProfile = async () => {
       if (!address) return;
 
       try {
-        const response = await fetch(`${apiEndpoint}${apiPrefix}/users/${address}`);
-        if (response.ok) {
-          const userData = await response.json();
-          if (userData.data) {
-            setRole(userData.data.role || null);
-            setName(userData.data.name || '');
-            setBio(userData.data.bio || '');
-          }
+        const userData = await userApi.getProfile(address);
+        if (userData) {
+          setRole(userData.role || null);
+          setName(userData.name || '');
+          setBio(userData.bio || '');
         }
       } catch (error) {
         console.error('Error fetching user profile:', error);
@@ -36,7 +32,7 @@ export default function ProfileSetup() {
     };
 
     fetchUserProfile();
-  }, [address, apiEndpoint, apiPrefix]);
+  }, [address]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,43 +42,20 @@ export default function ProfileSetup() {
     }
 
     setIsSubmitting(true);
-    const url = `${apiEndpoint}${apiPrefix}/users/${address}`;
     console.log(`[ProfileSetup] Starting profile update...`);
-    console.log(`[ProfileSetup] PUT URL: ${url}`);
     console.log(`[ProfileSetup] Payload:`, { role, name, bio, address });
 
     try {
-      // Use axios or standard fetch but we must handle credentials if we rely on cookies
-      // The current fetch implementation does not include credentials
-      const response = await fetch(url, {
-        method: 'PUT',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        // IMPORTANT: This allows the backend to set the HttpOnly cookie
-        credentials: 'include',
-        body: JSON.stringify({ 
-          role, 
-          name: name.trim(), 
-          bio: bio.trim(),
-          walletAddress: address 
-        }),
+      await userApi.updateProfile(address, {
+        role,
+        name: name.trim(),
+        bio: bio.trim(),
+        walletAddress: address
       });
-
-      console.log(`[ProfileSetup] Response Status: ${response.status} ${response.statusText}`);
-      const responseData = await response.json().catch(() => ({}));
-      console.log(`[ProfileSetup] Response Data:`, responseData);
-      
-      if (!response.ok) {
-        console.error(`[ProfileSetup] Request failed with status ${response.status}`);
-        throw new Error(responseData.message || 'Failed to save profile');
-      }
 
       console.log('[ProfileSetup] Profile saved successfully. Initiating navigation to /dashboard...');
       
-      // Force a short delay or state update before navigation to ensure cookie is set
-      // and useAuthCheck has time to re-run if needed
+      // Force a short delay to allow backend to process and cookie/state to settle
       setTimeout(() => {
         console.log('[ProfileSetup] Navigating now.');
         navigate('/dashboard');

@@ -1,5 +1,10 @@
 import crypto from 'crypto';
 
+export enum UserType {
+  ARTIST = 'artist',
+  REQUESTER = 'requester'
+}
+
 export interface UserPersistenceData {
   id: string;
   walletAddress?: string;
@@ -9,6 +14,11 @@ export interface UserPersistenceData {
   profileImage?: string;
   headerImage?: string;
   portfolio?: string[];
+  workDescription?: string;
+  isAvailable?: boolean;
+  cachedAverageRating?: number;
+  cachedTotalRatings?: number;
+  refreshToken?: string;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -21,6 +31,8 @@ export interface UserCreateData {
   profileImage?: string;
   headerImage?: string;
   portfolio?: string[];
+  workDescription?: string;
+  isAvailable?: boolean;
 }
 
 export class User {
@@ -33,6 +45,11 @@ export class User {
     private _profileImage: string | undefined,
     private _headerImage: string | undefined,
     private _portfolio: string[] | undefined,
+    private _workDescription: string | undefined,
+    private _isAvailable: boolean | undefined,
+    private _cachedAverageRating: number | undefined,
+    private _cachedTotalRatings: number | undefined,
+    private _refreshToken: string | undefined,
     private readonly _createdAt: Date = new Date(),
     private _updatedAt: Date = new Date(),
   ) {}
@@ -48,7 +65,12 @@ export class User {
       data.bio,
       data.profileImage,
       data.headerImage,
-      data.portfolio
+      data.portfolio,
+      data.workDescription,
+      data.isAvailable ?? true,
+      undefined, // cachedAverageRating
+      undefined, // cachedTotalRatings
+      undefined // No refresh token on creation
     );
   }
 
@@ -62,6 +84,11 @@ export class User {
       data.profileImage,
       data.headerImage,
       data.portfolio,
+      data.workDescription,
+      data.isAvailable,
+      data.cachedAverageRating,
+      data.cachedTotalRatings,
+      data.refreshToken,
       data.createdAt || new Date(),
       data.updatedAt || new Date(),
     );
@@ -77,6 +104,11 @@ export class User {
       profileImage: this._profileImage,
       headerImage: this._headerImage,
       portfolio: this._portfolio,
+      workDescription: this._workDescription,
+      isAvailable: this._isAvailable,
+      cachedAverageRating: this._cachedAverageRating,
+      cachedTotalRatings: this._cachedTotalRatings,
+      refreshToken: this._refreshToken,
       createdAt: this._createdAt,
       updatedAt: this._updatedAt,
     };
@@ -92,9 +124,23 @@ export class User {
       profileImage: this._profileImage,
       headerImage: this._headerImage,
       portfolio: this._portfolio,
+      workDescription: this._workDescription,
+      isAvailable: this._isAvailable,
+      cachedAverageRating: this._cachedAverageRating,
+      cachedTotalRatings: this._cachedTotalRatings,
       createdAt: this._createdAt,
       updatedAt: this._updatedAt,
     };
+  }
+
+  // Business Logic - Auth
+  setRefreshToken(token: string | undefined): void {
+    this._refreshToken = token;
+    this._updatedAt = new Date();
+  }
+
+  get refreshToken(): string | undefined {
+    return this._refreshToken;
   }
 
   // Business Logic - Reset Profile (for testing)
@@ -105,6 +151,10 @@ export class User {
     this._profileImage = undefined;
     this._headerImage = undefined;
     this._portfolio = undefined;
+    this._workDescription = undefined;
+    this._isAvailable = undefined;
+    this._cachedAverageRating = undefined;
+    this._cachedTotalRatings = undefined;
     this._updatedAt = new Date();
   }
 
@@ -129,6 +179,18 @@ export class User {
   get walletAddress(): string | undefined {
     return this._walletAddress;
   }
+  get workDescription(): string | undefined {
+    return this._workDescription;
+  }
+  get isAvailable(): boolean | undefined {
+    return this._isAvailable;
+  }
+  get cachedAverageRating(): number | undefined {
+    return this._cachedAverageRating;
+  }
+  get cachedTotalRatings(): number | undefined {
+    return this._cachedTotalRatings;
+  }
   get createdAt(): Date {
     return new Date(this._createdAt);
   } // Defensive copy
@@ -145,6 +207,8 @@ export class User {
     profileImage?: string;
     headerImage?: string;
     portfolio?: string[];
+    workDescription?: string;
+    isAvailable?: boolean;
   }): Promise<void> {
     let hasChanges = false;
 
@@ -181,6 +245,16 @@ export class User {
 
     if (data.portfolio && JSON.stringify(data.portfolio) !== JSON.stringify(this._portfolio)) {
       this._portfolio = data.portfolio;
+      hasChanges = true;
+    }
+
+    if (data.workDescription !== undefined && data.workDescription !== this._workDescription) {
+      this._workDescription = data.workDescription;
+      hasChanges = true;
+    }
+
+    if (data.isAvailable !== undefined && data.isAvailable !== this._isAvailable) {
+      this._isAvailable = data.isAvailable;
       hasChanges = true;
     }
 

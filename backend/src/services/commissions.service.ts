@@ -78,7 +78,9 @@ export class CommissionsService {
   }
 
   async findById(id: string): Promise<Commission> {
-    return this.commissionsRepository.findById(id);
+    const commission = await this.commissionsRepository.findById(id);
+    if (!commission) throw new HttpException(404, 'Commission not found');
+    return commission;
   }
 
   async getUserCommissions(userId: string): Promise<Commission[]> {

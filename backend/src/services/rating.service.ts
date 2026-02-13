@@ -31,12 +31,12 @@ export class RatingService {
       throw new HttpException(400, 'Commission must be completed to rate');
     }
 
-    if (commission.clientId !== data.raterId && commission.workerId !== data.raterId) {
+    if (commission.requesterId !== data.raterId && commission.providerId !== data.raterId) {
       throw new HttpException(403, 'You are not a participant of this commission');
     }
 
     // Determine who is being rated
-    const ratedUserId = commission.clientId === data.raterId ? commission.workerId : commission.clientId;
+    const ratedUserId = commission.requesterId === data.raterId ? commission.providerId : commission.requesterId;
     if (!ratedUserId) {
        throw new HttpException(400, 'No user to rate');
     }

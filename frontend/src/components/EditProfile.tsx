@@ -20,7 +20,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ label, value, onChange, multi
 
     setUploading(true);
     try {
-      const { signature, timestamp, cloudName, apiKey } = await commissionApi.getUploadSignature();
+      const { signature, timestamp, cloudName, apiKey, folder } = await commissionApi.getUploadSignature();
       const urls: string[] = [];
 
       for (let i = 0; i < files.length; i++) {
@@ -30,6 +30,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ label, value, onChange, multi
         formData.append('api_key', apiKey);
         formData.append('timestamp', timestamp.toString());
         formData.append('signature', signature);
+        if (folder) formData.append('folder', folder);
 
         const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
           method: 'POST',

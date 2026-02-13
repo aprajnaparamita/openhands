@@ -5,7 +5,7 @@ import { Routes } from '../interfaces/routes.interface.js';
 
 export class CommissionsRoute implements Routes {
   public path = '/commissions';
-  public router = Router();
+  public router: Router = Router();
   public commissionsController = new CommissionsController();
 
   constructor() {

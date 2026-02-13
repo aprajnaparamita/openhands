@@ -41,3 +41,9 @@ export const updateUserSchema = z.object({
 
 export type UpdateUserDto = z.infer<typeof updateUserSchema>;
 
+// Login with Wallet DTO
+export const loginWalletSchema = z.object({
+  walletAddress: walletAddressSchema,
+});
+
+export type LoginWalletDto = z.infer<typeof loginWalletSchema>;

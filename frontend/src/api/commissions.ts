@@ -37,7 +37,7 @@ export const commissionApi = {
     return response.data.data.token;
   },
   
-  getUploadSignature: async (): Promise<{ signature: string; timestamp: number; cloudName: string; apiKey: string }> => {
+  getUploadSignature: async (): Promise<{ signature: string; timestamp: number; cloudName: string; apiKey: string; folder?: string }> => {
     const response = await api.get('/commissions/upload-signature');
     return response.data.data;
   }

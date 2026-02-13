@@ -1,4 +1,4 @@
-import type { Request, Response } from 'express';
+import type { Request, Response, RequestHandler } from 'express';
 import { injectable, inject } from 'tsyringe';
 import { type UserCreateData } from '../entities/user.entity.js';
 import { UsersService } from '../services/users.service.js';
@@ -8,43 +8,36 @@ import { asyncHandler } from '../utils/asyncHandler.js';
 export class UsersController {
   constructor(@inject(UsersService) private readonly userService: UsersService) {}
 
-  getUsers = asyncHandler(async (req: Request, res: Response) => {
+  getUsers: RequestHandler = asyncHandler(async (req: Request, res: Response): Promise<void> => {
     const users = await this.userService.getAllUsers();
     const userResponses = users.map((user) => user.toResponse());
 
     res.json({ data: userResponses, message: 'findAll' });
   });
 
-  getUserById = asyncHandler(async (req: Request, res: Response) => {
+  getUserById: RequestHandler = asyncHandler(async (req: Request, res: Response): Promise<void> => {
     const userId: string = String(req.params.id);
     const user = await this.userService.getUserById(userId);
 
     res.json({ data: user.toResponse(), message: 'findById' });
   });
 
-  createUser = asyncHandler(async (req: Request, res: Response) => {
+  createUser: RequestHandler = asyncHandler(async (req: Request, res: Response): Promise<void> => {
     const userData: UserCreateData = req.body;
     const user = await this.userService.createUser(userData);
 
     res.status(201).json({ data: user.toResponse(), message: 'create' });
   });
 
-  updateUser = asyncHandler(async (req: Request, res: Response) => {
+  updateUser: RequestHandler = asyncHandler(async (req: Request, res: Response): Promise<void> => {
     const userId: string = String(req.params.id);
     const updateData = req.body;
     const user = await this.userService.updateUser(userId, updateData);
 
-    // After updating, we should probably set the auth cookie if it's not set
-    // This is a simple way to ensure the user is logged in after profile creation
-    // In a real app we'd use a proper auth service
-    const token = this.userService.createToken(user);
-    const cookie = this.userService.createCookie(token);
-
-    res.setHeader('Set-Cookie', [cookie]);
     res.json({ data: user.toResponse(), message: 'update' });
   });
 
-  resetUser = asyncHandler(async (req: Request, res: Response) => {
+  resetUser: RequestHandler = asyncHandler(async (req: Request, res: Response): Promise<void> => {
     // Only allow in development
     if (process.env.NODE_ENV !== 'development') {
       res.status(403).json({ message: 'Forbidden' });
@@ -61,7 +54,7 @@ export class UsersController {
     res.json({ message: 'reset' });
   });
 
-  deleteUser = asyncHandler(async (req: Request, res: Response) => {
+  deleteUser: RequestHandler = asyncHandler(async (req: Request, res: Response): Promise<void> => {
     const userId: string = String(req.params.id);
     await this.userService.deleteUser(userId);
 

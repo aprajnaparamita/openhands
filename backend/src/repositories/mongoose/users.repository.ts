@@ -23,7 +23,12 @@ export class MongooseUsersRepository implements IUsersRepository {
   }
 
   async findByWalletAddress(walletAddress: string): Promise<User | undefined> {
-    const user = await UserModel.findOne({ walletAddress }).lean();
+    const user = await UserModel.findOne({ walletAddress }).select('+refreshToken').lean();
+    return user ? User.fromPersistence(this.mapToPersistence(user)) : undefined;
+  }
+
+  async findByIdWithToken(id: string): Promise<User | undefined> {
+    const user = await UserModel.findById(id).select('+refreshToken').lean();
     return user ? User.fromPersistence(this.mapToPersistence(user)) : undefined;
   }
 
@@ -100,6 +105,7 @@ export class MongooseUsersRepository implements IUsersRepository {
       profileImage: mongooseDoc.profileImage,
       headerImage: mongooseDoc.headerImage,
       portfolio: mongooseDoc.portfolio,
+      refreshToken: mongooseDoc.refreshToken,
       createdAt: mongooseDoc.createdAt,
       updatedAt: mongooseDoc.updatedAt,
     };

@@ -2,9 +2,9 @@
 import { injectable, inject } from 'tsyringe';
 import { HttpException } from '@exceptions/httpException';
 import { User, UserType } from '@entities/user.entity';
-import { IUsersRepository } from '@repositories/users.repository';
-import { ICommissionsRepository } from '@repositories/mongoose/commissions.repository';
-import { UploadService } from './upload.service';
+import { UsersRepository } from '@repositories/users.repository';
+import { MongooseCommissionsRepository } from '@repositories/mongoose/commissions.repository';
+import { StorageService } from './storage.service';
 
 export interface UserProfileResponse {
   user: ReturnType<User['toResponse']>;
@@ -23,9 +23,9 @@ export interface UserProfileResponse {
 @injectable()
 export class ProfileService {
   constructor(
-    @inject(IUsersRepository) private usersRepository: IUsersRepository,
-    @inject(ICommissionsRepository) private commissionsRepository: ICommissionsRepository,
-    @inject(UploadService) private uploadService: UploadService
+    @inject(UsersRepository) private usersRepository: UsersRepository,
+    @inject(MongooseCommissionsRepository) private commissionsRepository: MongooseCommissionsRepository,
+    @inject(StorageService) private storageService: StorageService
   ) {}
 
   async updateProfile(
@@ -51,7 +51,7 @@ export class ProfileService {
 
     // Handle image uploads
     if (update.profileImage) {
-      const uploadResult = await this.uploadService.uploadImage(
+      const uploadResult = await this.storageService.uploadImage(
         update.profileImage,
         userId,
         {
@@ -68,7 +68,7 @@ export class ProfileService {
     }
 
     if (update.headerImage) {
-      const uploadResult = await this.uploadService.uploadImage(
+      const uploadResult = await this.storageService.uploadImage(
         update.headerImage,
         userId,
         {
@@ -107,13 +107,16 @@ export class ProfileService {
     const commissions = await this.commissionsRepository.findByUserId(userId);
     
     if (commissions.length > 0) {
-      response.commissions = commissions.map(commission => ({
-        commission: commission.toResponse(),
-        rating: commission.ratingId ? {
-          score: commission.ratingId.score,
-          review: commission.ratingId.review,
-        } : undefined,
-      }));
+      response.commissions = commissions.map(commission => {
+        const rating = typeof commission.ratingId === 'object' ? commission.ratingId : undefined;
+        return {
+          commission: commission.toResponse(),
+          rating: rating ? {
+            score: rating.score,
+            review: rating.review,
+          } : undefined,
+        };
+      });
 
       // Calculate stats
       const completedCommissions = commissions.filter(c => c.status === 'completed');
