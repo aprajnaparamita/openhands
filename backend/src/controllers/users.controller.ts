@@ -9,7 +9,15 @@ export class UsersController {
   constructor(@inject(UsersService) private readonly userService: UsersService) {}
 
   getUsers: RequestHandler = asyncHandler(async (req: Request, res: Response): Promise<void> => {
-    const users = await this.userService.getAllUsers();
+    const role = req.query.role;
+    let users;
+    
+    if (role === 'artist') {
+      users = await this.userService.getProviders();
+    } else {
+      users = await this.userService.getAllUsers();
+    }
+    
     const userResponses = users.map((user) => user.toResponse());
 
     res.json({ data: userResponses, message: 'findAll' });

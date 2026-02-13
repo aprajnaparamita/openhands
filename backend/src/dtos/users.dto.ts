@@ -14,6 +14,15 @@ export const bioSchema = z.string().max(1000).optional();
 export const profileImageSchema = z.string().url().optional();
 export const headerImageSchema = z.string().url().optional();
 export const portfolioSchema = z.array(z.string().url()).optional();
+export const skillsSchema = z.array(z.string()).optional();
+export const socialLinksSchema = z.object({
+  website: z.string().url().optional(),
+  twitter: z.string().optional(),
+  instagram: z.string().optional(),
+  github: z.string().optional(),
+}).optional();
+export const workDescriptionSchema = z.string().max(2000).optional();
+export const isAvailableSchema = z.boolean().optional();
 
 // Create User DTO
 export const createUserSchema = z.object({
@@ -24,6 +33,10 @@ export const createUserSchema = z.object({
   profileImage: profileImageSchema,
   headerImage: headerImageSchema,
   portfolio: portfolioSchema,
+  skills: skillsSchema,
+  socialLinks: socialLinksSchema,
+  workDescription: workDescriptionSchema,
+  isAvailable: isAvailableSchema,
 });
 
 export type CreateUserDto = z.infer<typeof createUserSchema>;
@@ -37,6 +50,10 @@ export const updateUserSchema = z.object({
   profileImage: profileImageSchema,
   headerImage: headerImageSchema,
   portfolio: portfolioSchema,
+  skills: skillsSchema,
+  socialLinks: socialLinksSchema,
+  workDescription: workDescriptionSchema,
+  isAvailable: isAvailableSchema,
 });
 
 export type UpdateUserDto = z.infer<typeof updateUserSchema>;

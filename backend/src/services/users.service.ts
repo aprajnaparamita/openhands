@@ -8,6 +8,10 @@ import type { IUsersRepository } from '../repositories/users.repository.js';
 export class UsersService {
   constructor(@inject(UsersRepository) private usersRepository: IUsersRepository) {}
 
+  async getProviders(): Promise<User[]> {
+    return this.usersRepository.findProviders();
+  }
+
   async getAllUsers(): Promise<User[]> {
     return this.usersRepository.findAll();
   }

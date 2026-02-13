@@ -16,8 +16,8 @@ Build comprehensive user profiles for artists including portfolios and media man
 - Secure pre-signed URL flow
 - MIME type validation
 - Image optimization
-- Virus scanning
 - Content moderation
+- NudeNet scanning with admin notification (going to be used elsewhere)
 
 ### API Endpoints
 - Create/update profile

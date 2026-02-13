@@ -1,5 +1,6 @@
 // src/infrastructure/mongoose/schemas/user.schema.ts
 import mongoose, { Schema } from 'mongoose';
+import crypto from 'crypto';
 
 const userSchema = new Schema(
   {
@@ -33,6 +34,16 @@ const userSchema = new Schema(
     portfolio: {
       type: [String],
       default: [],
+    },
+    skills: {
+      type: [String],
+      default: [],
+    },
+    socialLinks: {
+      website: String,
+      twitter: String,
+      instagram: String,
+      github: String,
     },
     workDescription: {
       type: String,

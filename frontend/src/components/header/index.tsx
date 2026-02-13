@@ -15,6 +15,12 @@ export default function Header() {
           <Link to="/dashboard" className={styles['nav-item']}>
             Projects
           </Link>
+          <Link to="/browse-artists" className={styles['nav-item']}>
+            Artists
+          </Link>
+          <Link to="/profile/edit" className={styles['nav-item']}>
+            My Profile
+          </Link>
           <a href='https://github.com/aprajnaparamita/openhands' target='_blank' className={styles['nav-item']} rel='noreferrer'>
             Github
           </a>

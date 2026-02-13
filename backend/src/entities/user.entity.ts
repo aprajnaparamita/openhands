@@ -14,6 +14,13 @@ export interface UserPersistenceData {
   profileImage?: string;
   headerImage?: string;
   portfolio?: string[];
+  skills?: string[];
+  socialLinks?: {
+    website?: string;
+    twitter?: string;
+    instagram?: string;
+    github?: string;
+  };
   workDescription?: string;
   isAvailable?: boolean;
   cachedAverageRating?: number;
@@ -31,6 +38,13 @@ export interface UserCreateData {
   profileImage?: string;
   headerImage?: string;
   portfolio?: string[];
+  skills?: string[];
+  socialLinks?: {
+    website?: string;
+    twitter?: string;
+    instagram?: string;
+    github?: string;
+  };
   workDescription?: string;
   isAvailable?: boolean;
 }
@@ -45,6 +59,8 @@ export class User {
     private _profileImage: string | undefined,
     private _headerImage: string | undefined,
     private _portfolio: string[] | undefined,
+    private _skills: string[] | undefined,
+    private _socialLinks: { website?: string; twitter?: string; instagram?: string; github?: string } | undefined,
     private _workDescription: string | undefined,
     private _isAvailable: boolean | undefined,
     private _cachedAverageRating: number | undefined,
@@ -66,6 +82,8 @@ export class User {
       data.profileImage,
       data.headerImage,
       data.portfolio,
+      data.skills,
+      data.socialLinks,
       data.workDescription,
       data.isAvailable ?? true,
       undefined, // cachedAverageRating
@@ -84,6 +102,8 @@ export class User {
       data.profileImage,
       data.headerImage,
       data.portfolio,
+      data.skills,
+      data.socialLinks,
       data.workDescription,
       data.isAvailable,
       data.cachedAverageRating,
@@ -104,6 +124,8 @@ export class User {
       profileImage: this._profileImage,
       headerImage: this._headerImage,
       portfolio: this._portfolio,
+      skills: this._skills,
+      socialLinks: this._socialLinks,
       workDescription: this._workDescription,
       isAvailable: this._isAvailable,
       cachedAverageRating: this._cachedAverageRating,
@@ -124,6 +146,8 @@ export class User {
       profileImage: this._profileImage,
       headerImage: this._headerImage,
       portfolio: this._portfolio,
+      skills: this._skills,
+      socialLinks: this._socialLinks,
       workDescription: this._workDescription,
       isAvailable: this._isAvailable,
       cachedAverageRating: this._cachedAverageRating,
@@ -151,6 +175,8 @@ export class User {
     this._profileImage = undefined;
     this._headerImage = undefined;
     this._portfolio = undefined;
+    this._skills = undefined;
+    this._socialLinks = undefined;
     this._workDescription = undefined;
     this._isAvailable = undefined;
     this._cachedAverageRating = undefined;
@@ -207,6 +233,8 @@ export class User {
     profileImage?: string;
     headerImage?: string;
     portfolio?: string[];
+    skills?: string[];
+    socialLinks?: { website?: string; twitter?: string; instagram?: string; github?: string };
     workDescription?: string;
     isAvailable?: boolean;
   }): Promise<void> {
@@ -245,6 +273,16 @@ export class User {
 
     if (data.portfolio && JSON.stringify(data.portfolio) !== JSON.stringify(this._portfolio)) {
       this._portfolio = data.portfolio;
+      hasChanges = true;
+    }
+
+    if (data.skills && JSON.stringify(data.skills) !== JSON.stringify(this._skills)) {
+      this._skills = data.skills;
+      hasChanges = true;
+    }
+
+    if (data.socialLinks && JSON.stringify(data.socialLinks) !== JSON.stringify(this._socialLinks)) {
+      this._socialLinks = data.socialLinks;
       hasChanges = true;
     }
 

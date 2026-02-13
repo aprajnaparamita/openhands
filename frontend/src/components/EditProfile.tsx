@@ -119,6 +119,8 @@ export const EditProfile: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   
+  const [skillsInput, setSkillsInput] = useState('');
+  
   const [formData, setFormData] = useState({
     name: '',
     bio: '',
@@ -126,6 +128,15 @@ export const EditProfile: React.FC = () => {
     profileImage: '',
     headerImage: '',
     portfolio: [] as string[],
+    skills: [] as string[],
+    socialLinks: {
+      website: '',
+      twitter: '',
+      instagram: '',
+      github: '',
+    },
+    workDescription: '',
+    isAvailable: true,
   });
 
   useEffect(() => {
@@ -143,7 +154,17 @@ export const EditProfile: React.FC = () => {
           profileImage: data.profileImage || '',
           headerImage: data.headerImage || '',
           portfolio: data.portfolio || [],
+          skills: data.skills || [],
+          socialLinks: {
+            website: data.socialLinks?.website || '',
+            twitter: data.socialLinks?.twitter || '',
+            instagram: data.socialLinks?.instagram || '',
+            github: data.socialLinks?.github || '',
+          },
+          workDescription: data.workDescription || '',
+          isAvailable: data.isAvailable !== undefined ? data.isAvailable : true,
         });
+        setSkillsInput(data.skills ? data.skills.join(', ') : '');
       } catch (error) {
         console.error('Failed to load profile', error);
       } finally {
@@ -176,15 +197,30 @@ export const EditProfile: React.FC = () => {
       <h1 className="text-3xl font-bold mb-8">Edit Profile</h1>
       
       <form onSubmit={handleSubmit} className="space-y-6 bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
-          <input
-            type="text"
-            value={formData.name}
-            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            required
-          />
+        <div className="flex items-center justify-between">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+            <input
+              type="text"
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              required
+            />
+          </div>
+          
+          <div className="flex items-center ml-4">
+             <input
+                type="checkbox"
+                id="isAvailable"
+                checked={formData.isAvailable}
+                onChange={(e) => setFormData({ ...formData, isAvailable: e.target.checked })}
+                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+             />
+             <label htmlFor="isAvailable" className="ml-2 block text-sm text-gray-900">
+               Available for work
+             </label>
+          </div>
         </div>
 
         <div>
@@ -192,9 +228,77 @@ export const EditProfile: React.FC = () => {
           <textarea
             value={formData.bio}
             onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
-            rows={4}
+            rows={3}
             className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Work Description / Terms</label>
+          <textarea
+            value={formData.workDescription}
+            onChange={(e) => setFormData({ ...formData, workDescription: e.target.value })}
+            rows={4}
+            placeholder="Describe your services, pricing, and terms..."
+            className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Skills (comma separated)</label>
+          <input
+            type="text"
+            value={skillsInput}
+            onChange={(e) => {
+              setSkillsInput(e.target.value);
+              setFormData({ ...formData, skills: e.target.value.split(',').map(s => s.trim()).filter(Boolean) });
+            }}
+            placeholder="Illustration, 3D Modeling, React, Smart Contracts..."
+            className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Website</label>
+              <input
+                type="url"
+                value={formData.socialLinks.website}
+                onChange={(e) => setFormData({ ...formData, socialLinks: { ...formData.socialLinks, website: e.target.value } })}
+                placeholder="https://yourportfolio.com"
+                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Twitter (X)</label>
+              <input
+                type="text"
+                value={formData.socialLinks.twitter}
+                onChange={(e) => setFormData({ ...formData, socialLinks: { ...formData.socialLinks, twitter: e.target.value } })}
+                placeholder="@username"
+                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Instagram</label>
+              <input
+                type="text"
+                value={formData.socialLinks.instagram}
+                onChange={(e) => setFormData({ ...formData, socialLinks: { ...formData.socialLinks, instagram: e.target.value } })}
+                placeholder="@username"
+                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">GitHub</label>
+              <input
+                type="text"
+                value={formData.socialLinks.github}
+                onChange={(e) => setFormData({ ...formData, socialLinks: { ...formData.socialLinks, github: e.target.value } })}
+                placeholder="username"
+                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
         </div>
 
         <ImageUpload

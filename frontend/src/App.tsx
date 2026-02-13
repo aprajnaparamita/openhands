@@ -9,6 +9,7 @@ import { CreateCommission } from './components/Commission/CreateCommission';
 import { CommissionDetail } from './components/Commission/CommissionDetail';
 import { ResetUser } from './components/ResetUser';
 import { EditProfile } from './components/EditProfile';
+import { ProfileView } from './components/ProfileView';
 import { BrowseArtists } from './components/BrowseArtists';
 import { MyAccount } from './components/MyAccount';
 import Header from './components/header';
@@ -61,6 +62,10 @@ function App() {
                 <Navigate to="/" replace />
               )
             }
+          />
+          <Route
+            path="/profile/:walletAddress"
+            element={<ProfileView />}
           />
           <Route
             path="/browse-artists"
