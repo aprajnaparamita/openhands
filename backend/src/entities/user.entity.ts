@@ -25,6 +25,7 @@ export interface UserPersistenceData {
   isAvailable?: boolean;
   cachedAverageRating?: number;
   cachedTotalRatings?: number;
+  cachedCompletionRate?: number;
   refreshToken?: string;
   createdAt?: Date;
   updatedAt?: Date;
@@ -65,6 +66,7 @@ export class User {
     private _isAvailable: boolean | undefined,
     private _cachedAverageRating: number | undefined,
     private _cachedTotalRatings: number | undefined,
+    private _cachedCompletionRate: number | undefined,
     private _refreshToken: string | undefined,
     private readonly _createdAt: Date = new Date(),
     private _updatedAt: Date = new Date(),
@@ -88,6 +90,7 @@ export class User {
       data.isAvailable ?? true,
       undefined, // cachedAverageRating
       undefined, // cachedTotalRatings
+      undefined, // cachedCompletionRate
       undefined // No refresh token on creation
     );
   }
@@ -108,6 +111,7 @@ export class User {
       data.isAvailable,
       data.cachedAverageRating,
       data.cachedTotalRatings,
+      data.cachedCompletionRate,
       data.refreshToken,
       data.createdAt || new Date(),
       data.updatedAt || new Date(),
@@ -130,6 +134,7 @@ export class User {
       isAvailable: this._isAvailable,
       cachedAverageRating: this._cachedAverageRating,
       cachedTotalRatings: this._cachedTotalRatings,
+      cachedCompletionRate: this._cachedCompletionRate,
       refreshToken: this._refreshToken,
       createdAt: this._createdAt,
       updatedAt: this._updatedAt,
@@ -152,6 +157,7 @@ export class User {
       isAvailable: this._isAvailable,
       cachedAverageRating: this._cachedAverageRating,
       cachedTotalRatings: this._cachedTotalRatings,
+      cachedCompletionRate: this._cachedCompletionRate,
       createdAt: this._createdAt,
       updatedAt: this._updatedAt,
     };
@@ -181,6 +187,7 @@ export class User {
     this._isAvailable = undefined;
     this._cachedAverageRating = undefined;
     this._cachedTotalRatings = undefined;
+    this._cachedCompletionRate = undefined;
     this._updatedAt = new Date();
   }
 
@@ -216,6 +223,9 @@ export class User {
   }
   get cachedTotalRatings(): number | undefined {
     return this._cachedTotalRatings;
+  }
+  get cachedCompletionRate(): number | undefined {
+    return this._cachedCompletionRate;
   }
   get createdAt(): Date {
     return new Date(this._createdAt);
@@ -299,6 +309,17 @@ export class User {
     if (hasChanges) {
       this._updatedAt = new Date();
     }
+  }
+
+  updateReputation(average: number, total: number): void {
+    this._cachedAverageRating = average;
+    this._cachedTotalRatings = total;
+    this._updatedAt = new Date();
+  }
+
+  updateCompletionRate(rate: number): void {
+    this._cachedCompletionRate = rate;
+    this._updatedAt = new Date();
   }
 
   // Equality Comparison

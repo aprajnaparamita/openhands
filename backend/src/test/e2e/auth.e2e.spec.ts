@@ -13,28 +13,51 @@ describe('Auth API', () => {
     resetUserDB(); // Reset repository before each test
   });
 
-  const user = { email: 'authuser@example.com', password: 'authpassword123' };
+  const walletUser = { 
+    walletAddress: '0x742d35Cc6634C0532925a3b844Bc454e4438f44e' 
+  };
 
-  it('should successfully register a new user', async () => {
-    const res = await request(server).post(`${prefix}/auth/signup`).send(user);
-    expect(res.statusCode).toBe(201);
-    expect(res.body.data.email).toBe(user.email);
-  });
-
-  it('should login a user and set a cookie', async () => {
-    await request(server).post(`${prefix}/auth/signup`).send(user);
-    const res = await request(server).post(`${prefix}/auth/login`).send(user);
+  it('should login with wallet and set a cookie', async () => {
+    const res = await request(server)
+      .post(`${prefix}/auth/wallet`)
+      .send(walletUser);
+      
     expect(res.statusCode).toBe(200);
-    expect(res.body.data.email).toBe(user.email);
+    expect(res.body.data.walletAddress).toBe(walletUser.walletAddress);
     expect(res.header['set-cookie']).toBeDefined();
   });
 
   it('should logout a user', async () => {
-    await request(server).post(`${prefix}/auth/signup`).send(user);
-    const loginRes = await request(server).post(`${prefix}/auth/login`).send(user);
+    // First login
+    const loginRes = await request(server)
+      .post(`${prefix}/auth/wallet`)
+      .send(walletUser);
+      
     const cookie = loginRes.headers['set-cookie'];
-    const logoutRes = await request(server).post(`${prefix}/auth/logout`).set('Cookie', cookie[0]);
+    
+    // Then logout
+    const logoutRes = await request(server)
+      .post(`${prefix}/auth/logout`)
+      .set('Cookie', cookie);
+      
     expect(logoutRes.statusCode).toBe(200);
     expect(logoutRes.body.message).toBe('logout');
+  });
+
+  it('should get current user (me)', async () => {
+    // First login
+    const loginRes = await request(server)
+      .post(`${prefix}/auth/wallet`)
+      .send(walletUser);
+      
+    const cookie = loginRes.headers['set-cookie'];
+
+    // Get me
+    const meRes = await request(server)
+      .get(`${prefix}/auth/me`)
+      .set('Cookie', cookie);
+
+    expect(meRes.statusCode).toBe(200);
+    expect(meRes.body.data.walletAddress).toBe(walletUser.walletAddress);
   });
 });

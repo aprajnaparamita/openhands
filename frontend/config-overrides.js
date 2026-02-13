@@ -10,6 +10,7 @@ module.exports = function override(config, env) {
     stream: require.resolve('stream-browserify'),
     assert: require.resolve('assert'),
     zlib: require.resolve('browserify-zlib'),
+    buffer: require.resolve('buffer'),
     url: false,
   };
 

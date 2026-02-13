@@ -19,8 +19,10 @@ export class UsersService {
   async getUserById(id: string): Promise<User> {
     let user: User | undefined;
     
-    // Check if ID is a wallet address
-    if (id.startsWith('0x') || id.length > 30) {
+    // Check if ID is a UUID (Mongo ID or standard UUID)
+    const isUuid = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(id);
+    
+    if (!isUuid && (id.startsWith('0x') || id.length > 30)) {
       user = await this.usersRepository.findByWalletAddress(id);
     } else {
       user = await this.usersRepository.findById(id);
@@ -60,7 +62,7 @@ export class UsersService {
     console.log(`[UsersService] updateUser: Updating user ${id}`, updateData);
     let existingUser: User | undefined;
     
-    if (id.startsWith('0x') || id.length > 30) {
+    if (id.startsWith('0x') || (id.length > 30 && !/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(id))) {
       existingUser = await this.usersRepository.findByWalletAddress(id);
     } else {
       existingUser = await this.usersRepository.findById(id);
@@ -70,7 +72,7 @@ export class UsersService {
       console.log(`[UsersService] updateUser: User ${id} not found. Attempting create.`);
       // For wallet users, we might want to create on update if they don't exist yet
       // This supports the flow where PUT is called before POST
-      const isWallet = id.startsWith('0x') || id.length > 30;
+      const isWallet = id.startsWith('0x') || (id.length > 30 && !/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(id));
       
       if (isWallet) {
         // Create new user with this wallet address and the update data

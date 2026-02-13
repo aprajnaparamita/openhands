@@ -24,6 +24,7 @@ interface UserProfile {
   isAvailable?: boolean;
   cachedAverageRating?: number;
   cachedTotalRatings?: number;
+  cachedCompletionRate?: number;
 }
 
 export const ProfileView: React.FC = () => {
@@ -196,6 +197,14 @@ export const ProfileView: React.FC = () => {
                  <div className="flex justify-between">
                    <span className="text-gray-600">Rating</span>
                    <span className="font-semibold">{profile.cachedAverageRating?.toFixed(1) || '-'}</span>
+                 </div>
+                 <div className="flex justify-between">
+                   <span className="text-gray-600">Completion Rate</span>
+                   <span className="font-semibold">
+                     {profile.cachedCompletionRate !== undefined 
+                       ? `${(profile.cachedCompletionRate * 100).toFixed(0)}%` 
+                       : '100%'}
+                   </span>
                  </div>
                </div>
             </section>

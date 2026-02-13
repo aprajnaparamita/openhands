@@ -60,6 +60,9 @@ importers:
       browserify-zlib:
         specifier: ^0.2.0
         version: 0.2.0
+      buffer:
+        specifier: ^6.0.3
+        version: 6.0.3
       classnames:
         specifier: ^2.5.1
         version: 2.5.1

@@ -54,12 +54,15 @@ describe('UsersService (with UsersRepository)', () => {
     expect(all.length).toBe(3);
   });
 
-  it('createUser: should throw if walletAddress already exists', async () => {
+  it('createUser: should return existing user if walletAddress already exists (idempotent)', async () => {
     const userData: UserCreateData = {
       walletAddress: 'wallet1', // already exists
     };
 
-    await expect(usersService.createUser(userData)).rejects.toThrow(/exists/);
+    // Should not throw, but return the existing user
+    const result = await usersService.createUser(userData);
+    expect(result).toBeDefined();
+    expect(result.walletAddress).toBe('wallet1');
   });
 
   it('updateUser: should update user profile', async () => {

@@ -9,6 +9,8 @@ interface Artist {
   profileImage?: string;
   skills?: string[];
   portfolio?: string[];
+  cachedAverageRating?: number;
+  cachedTotalRatings?: number;
 }
 
 export const BrowseArtists: React.FC = () => {
@@ -65,6 +67,17 @@ export const BrowseArtists: React.FC = () => {
                   <div>
                     <h2 className="text-lg font-semibold text-gray-900">{artist.name}</h2>
                     <p className="text-sm text-gray-500 truncate w-40">{artist.walletAddress}</p>
+                    {artist.cachedAverageRating !== undefined && (
+                      <div className="flex items-center mt-1">
+                        <span className="text-yellow-400 mr-1">★</span>
+                        <span className="text-sm font-medium text-gray-700">
+                          {artist.cachedAverageRating.toFixed(1)}
+                        </span>
+                        <span className="text-xs text-gray-500 ml-1">
+                          ({artist.cachedTotalRatings || 0})
+                        </span>
+                      </div>
+                    )}
                   </div>
                 </div>
                 

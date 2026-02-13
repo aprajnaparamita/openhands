@@ -272,9 +272,13 @@ export const CommissionDetail: React.FC = () => {
                     <textarea
                       value={reviewText}
                       onChange={(e) => setReviewText(e.target.value)}
+                      maxLength={200}
                       className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                       rows={3}
                     />
+                    <div className="text-right text-xs text-gray-500 mt-1">
+                      {reviewText.length}/200
+                    </div>
                   </div>
                   <button
                     onClick={handleReviewSubmit}
