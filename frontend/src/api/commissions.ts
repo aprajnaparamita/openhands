@@ -22,28 +22,28 @@ export const commissionApi = {
     return response.data.data;
   },
 
-  fund: async (id: string): Promise<Commission> => {
-    const response = await api.post(`/commissions/${id}/fund`);
+  fund: async (id: string, txSignature?: string): Promise<Commission> => {
+    const response = await api.post(`/commissions/${id}/fund`, { txSignature });
     return response.data.data;
   },
 
-  accept: async (id: string): Promise<Commission> => {
-    const response = await api.post(`/commissions/${id}/accept`);
+  accept: async (id: string, txSignature?: string): Promise<Commission> => {
+    const response = await api.post(`/commissions/${id}/accept`, { txSignature });
     return response.data.data;
   },
 
-  deliver: async (id: string, artworkUrl: string, hash: string): Promise<Commission> => {
-    const response = await api.post(`/commissions/${id}/deliver`, { artworkUrl, hash });
+  deliver: async (id: string, artworkUrl: string, hash: string, txSignature?: string): Promise<Commission> => {
+    const response = await api.post(`/commissions/${id}/deliver`, { artworkUrl, hash, txSignature });
     return response.data.data;
   },
 
-  review: async (id: string, score: number, review: string): Promise<Commission> => {
-    const response = await api.post(`/commissions/${id}/review`, { score, review });
+  review: async (id: string, score: number, review: string, txSignature?: string): Promise<Commission> => {
+    const response = await api.post(`/commissions/${id}/review`, { score, review, txSignature });
     return response.data.data;
   },
 
-  complete: async (id: string): Promise<Commission> => {
-    const response = await api.post(`/commissions/${id}/complete`);
+  complete: async (id: string, txSignature?: string): Promise<Commission> => {
+    const response = await api.post(`/commissions/${id}/complete`, { txSignature });
     return response.data.data;
   },
 

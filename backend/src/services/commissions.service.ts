@@ -24,7 +24,7 @@ export class CommissionsService {
     return this.commissionsRepository.save(commission);
   }
 
-  async fundCommission(commissionId: string, requesterId: string): Promise<Commission> {
+  async fundCommission(commissionId: string, requesterId: string, txSignature?: string): Promise<Commission> {
     const commission = await this.commissionsRepository.findById(commissionId);
     if (!commission) throw new HttpException(404, 'Commission not found');
     
@@ -32,11 +32,11 @@ export class CommissionsService {
       throw new HttpException(403, 'Only the requester can fund this commission');
     }
 
-    commission.fund();
+    commission.fund(txSignature);
     return this.commissionsRepository.update(commissionId, commission) as Promise<Commission>;
   }
 
-  async acceptCommission(commissionId: string, providerId: string): Promise<Commission> {
+  async acceptCommission(commissionId: string, providerId: string, txSignature?: string): Promise<Commission> {
     const commission = await this.commissionsRepository.findById(commissionId);
     if (!commission) throw new HttpException(404, 'Commission not found');
 
@@ -53,11 +53,11 @@ export class CommissionsService {
        throw new HttpException(400, 'New providers can only have 1 active project');
     }
 
-    commission.accept(providerId);
+    commission.accept(providerId, txSignature);
     return this.commissionsRepository.update(commissionId, commission) as Promise<Commission>;
   }
 
-  async reviewCommission(commissionId: string, userId: string, rating: { score: number; review: string }): Promise<Commission> {
+  async reviewCommission(commissionId: string, userId: string, rating: { score: number; review: string }, txSignature?: string): Promise<Commission> {
     const commission = await this.commissionsRepository.findById(commissionId);
     if (!commission) throw new HttpException(404, 'Commission not found');
 
@@ -65,7 +65,7 @@ export class CommissionsService {
       throw new HttpException(403, 'Only the requester can review the work');
     }
 
-    commission.review(rating);
+    commission.review(rating, txSignature);
     return this.commissionsRepository.update(commissionId, commission) as Promise<Commission>;
   }
 
@@ -80,7 +80,7 @@ export class CommissionsService {
     return this.chatService.grantToken(userId, commissionId);
   }
 
-  async deliverWork(commissionId: string, providerId: string, artworkUrl: string, hash: string): Promise<Commission> {
+  async deliverWork(commissionId: string, providerId: string, artworkUrl: string, hash: string, txSignature?: string): Promise<Commission> {
     const commission = await this.commissionsRepository.findById(commissionId);
     if (!commission) throw new HttpException(404, 'Commission not found');
 
@@ -93,11 +93,11 @@ export class CommissionsService {
         commission.startWork(); // Transition to In Progress implicitly if needed, or explicitly.
     }
 
-    commission.deliverWork(artworkUrl, hash);
+    commission.deliverWork(artworkUrl, hash, txSignature);
     return this.commissionsRepository.update(commissionId, commission) as Promise<Commission>;
   }
 
-  async completeCommission(commissionId: string, userId: string): Promise<Commission> {
+  async completeCommission(commissionId: string, userId: string, txSignature?: string): Promise<Commission> {
     const commission = await this.commissionsRepository.findById(commissionId);
     if (!commission) throw new HttpException(404, 'Commission not found');
 
@@ -105,7 +105,7 @@ export class CommissionsService {
     // For now, let's assume one party triggers completion after reviews.
     // Or maybe "complete" is the final step after funds release.
     
-    commission.complete();
+    commission.complete(txSignature);
     return this.commissionsRepository.update(commissionId, commission) as Promise<Commission>;
   }
 

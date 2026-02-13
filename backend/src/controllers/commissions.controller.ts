@@ -24,7 +24,8 @@ export class CommissionsController {
       const userReq = req as RequestWithUser;
       const commissionId = req.params.id as string;
       const providerId = userReq.user.id;
-      const updatedCommission = await this.commissionsService.acceptCommission(commissionId, providerId);
+      const { txSignature } = req.body;
+      const updatedCommission = await this.commissionsService.acceptCommission(commissionId, providerId, txSignature);
       res.status(200).json({ data: updatedCommission, message: 'accepted' });
     } catch (error) {
       next(error);
@@ -35,8 +36,8 @@ export class CommissionsController {
     try {
       const userReq = req as RequestWithUser;
       const commissionId = req.params.id as string;
-      const { artworkUrl, hash } = req.body;
-      const updatedCommission = await this.commissionsService.deliverWork(commissionId, userReq.user.id, artworkUrl, hash);
+      const { artworkUrl, hash, txSignature } = req.body;
+      const updatedCommission = await this.commissionsService.deliverWork(commissionId, userReq.user.id, artworkUrl, hash, txSignature);
       res.status(200).json({ data: updatedCommission, message: 'delivered' });
     } catch (error) {
       next(error);
@@ -47,7 +48,8 @@ export class CommissionsController {
     try {
       const userReq = req as RequestWithUser;
       const commissionId = req.params.id as string;
-      const updatedCommission = await this.commissionsService.completeCommission(commissionId, userReq.user.id);
+      const { txSignature } = req.body;
+      const updatedCommission = await this.commissionsService.completeCommission(commissionId, userReq.user.id, txSignature);
       res.status(200).json({ data: updatedCommission, message: 'completed' });
     } catch (error) {
       next(error);
@@ -107,7 +109,8 @@ export class CommissionsController {
     try {
       const userReq = req as RequestWithUser;
       const commissionId = req.params.id as string;
-      const updatedCommission = await this.commissionsService.fundCommission(commissionId, userReq.user.id);
+      const { txSignature } = req.body;
+      const updatedCommission = await this.commissionsService.fundCommission(commissionId, userReq.user.id, txSignature);
       res.status(200).json({ data: updatedCommission, message: 'funded' });
     } catch (error) {
       next(error);
@@ -118,8 +121,8 @@ export class CommissionsController {
     try {
       const userReq = req as RequestWithUser;
       const commissionId = req.params.id as string;
-      const { score, review } = req.body;
-      const updatedCommission = await this.commissionsService.reviewCommission(commissionId, userReq.user.id, { score, review });
+      const { score, review, txSignature } = req.body;
+      const updatedCommission = await this.commissionsService.reviewCommission(commissionId, userReq.user.id, { score, review }, txSignature);
       res.status(200).json({ data: updatedCommission, message: 'reviewed' });
     } catch (error) {
       next(error);

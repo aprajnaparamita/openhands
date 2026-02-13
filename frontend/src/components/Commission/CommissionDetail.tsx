@@ -5,18 +5,23 @@ import { commissionApi } from '../../api/commissions';
 import { Commission, CommissionStatus } from '../../types/commission';
 import { Chat } from '../Chat/Chat';
 import { uploadToCloudinary } from '../../utils/upload';
+import { useEscrow } from '../../hooks/useEscrow';
 
 export const CommissionDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { address } = useAccount();
   const [commission, setCommission] = useState<Commission | null>(null);
   const [currentUser, setCurrentUser] = useState<any>(null);
+  const [requester, setRequester] = useState<any>(null);
+  const [provider, setProvider] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [chatToken, setChatToken] = useState<string | null>(null);
   const [deliveryFile, setDeliveryFile] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [reviewScore, setReviewScore] = useState(5);
   const [reviewText, setReviewText] = useState('');
+  
+  const { initializeEscrow, acceptProject, releasePayment, submitReview, deliverProject, loading: escrowLoading } = useEscrow();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -32,6 +37,20 @@ export const CommissionDetail: React.FC = () => {
         // Fetch commission
         const comm = await commissionApi.getById(id);
         setCommission(comm);
+        
+        // Fetch requester details if needed
+        if (comm.requesterId) {
+            const reqRes = await fetch(`${process.env.REACT_APP_API_SERVER_URL}${process.env.REACT_APP_API_PREFIX}/users/${comm.requesterId}`);
+            const reqData = await reqRes.json();
+            setRequester(reqData.data);
+        }
+
+        // Fetch provider details if needed
+        if (comm.providerId) {
+            const provRes = await fetch(`${process.env.REACT_APP_API_SERVER_URL}${process.env.REACT_APP_API_PREFIX}/users/${comm.providerId}`);
+            const provData = await provRes.json();
+            setProvider(provData.data);
+        }
 
         // If user is involved and status allows, get chat token
         if (
@@ -53,43 +72,53 @@ export const CommissionDetail: React.FC = () => {
   }, [id, address]);
 
   const handleFund = async () => {
-    if (!id) return;
+    if (!id || !commission) return;
     try {
-      const updated = await commissionApi.fund(id);
-      setCommission(updated);
+      const tx = await initializeEscrow(commission.price, id);
+      if (tx) {
+        const updated = await commissionApi.fund(id, tx);
+        setCommission(updated);
+      }
     } catch (error) {
       console.error('Failed to fund:', error);
-      alert('Failed to fund project');
+      alert('Failed to fund project: ' + (error as Error).message);
     }
   };
 
   const handleAccept = async () => {
-    if (!id) return;
+    if (!id || !requester) return;
     try {
-      const updated = await commissionApi.accept(id);
-      setCommission(updated);
-      // Refresh to get chat token
-      window.location.reload();
+      // Use requester wallet address to find the escrow PDA
+      const tx = await acceptProject(requester.walletAddress);
+      if (tx) {
+        const updated = await commissionApi.accept(id, tx);
+        setCommission(updated);
+        // Refresh to get chat token
+        window.location.reload();
+      }
     } catch (error) {
       console.error('Failed to accept:', error);
-      alert('Failed to accept project. You may have reached your active project limit.');
+      alert('Failed to accept project. ' + (error as Error).message);
     }
   };
 
   const handleReviewSubmit = async () => {
-    if (!id) return;
+    if (!id || !provider) return;
     try {
-      const updated = await commissionApi.review(id, reviewScore, reviewText);
-      setCommission(updated);
+      const tx = await submitReview(reviewScore, reviewText, provider.walletAddress);
+      if (tx) {
+        const updated = await commissionApi.review(id, reviewScore, reviewText, tx);
+        setCommission(updated);
+      }
     } catch (error) {
       console.error('Failed to review:', error);
-      alert('Failed to submit review');
+      alert('Failed to submit review: ' + (error as Error).message);
     }
   };
 
   const handleDeliver = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!id || !deliveryFile) return;
+    if (!id || !deliveryFile || !requester) return;
 
     setIsSubmitting(true);
     try {
@@ -97,10 +126,15 @@ export const CommissionDetail: React.FC = () => {
       // Mock hash for now, in real app this would be IPFS hash or similar
       const hash = '0x' + Math.random().toString(16).substr(2, 40);
       
-      const updated = await commissionApi.deliver(id, url, hash);
-      setCommission(updated);
+      const tx = await deliverProject(requester.walletAddress);
+      
+      if (tx) {
+        const updated = await commissionApi.deliver(id, url, hash, tx);
+        setCommission(updated);
+      }
     } catch (error) {
       console.error('Failed to deliver:', error);
+      alert('Failed to deliver project: ' + (error as Error).message);
     } finally {
       setIsSubmitting(false);
     }
@@ -109,10 +143,16 @@ export const CommissionDetail: React.FC = () => {
   const handleComplete = async () => {
     if (!id) return;
     try {
-      const updated = await commissionApi.complete(id);
-      setCommission(updated);
+      // Release payment from escrow
+      const tx = await releasePayment();
+      
+      if (tx) {
+        const updated = await commissionApi.complete(id, tx);
+        setCommission(updated);
+      }
     } catch (error) {
       console.error('Failed to complete:', error);
+      alert('Failed to release payment: ' + (error as Error).message);
     }
   };
 

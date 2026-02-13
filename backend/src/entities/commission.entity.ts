@@ -33,6 +33,13 @@ export interface CommissionPersistenceData {
   completedAt?: Date;
   cancelledAt?: Date;
   ratingId?: string | { score: number; review: string };
+  txSignatures?: {
+    fund?: string;
+    accept?: string;
+    deliver?: string;
+    review?: string;
+    complete?: string;
+  };
   createdAt: Date;
   updatedAt: Date;
 }
@@ -55,6 +62,7 @@ export class Commission {
     private _completedAt?: Date,
     private _cancelledAt?: Date,
     private _ratingId?: string | { score: number; review: string },
+    private _txSignatures: { fund?: string; accept?: string; deliver?: string; review?: string; complete?: string } = {},
     private readonly _createdAt: Date = new Date(),
     private _updatedAt: Date = new Date()
   ) {}
@@ -105,6 +113,7 @@ export class Commission {
       data.completedAt,
       data.cancelledAt,
       data.ratingId,
+      data.txSignatures || {},
       data.createdAt,
       data.updatedAt
     );
@@ -125,17 +134,19 @@ export class Commission {
   get escrowAddress(): string | undefined { return this._escrowAddress; }
   get startedAt(): Date | undefined { return this._startedAt ? new Date(this._startedAt) : undefined; }
   get completedAt(): Date | undefined { return this._completedAt ? new Date(this._completedAt) : undefined; }
+  get txSignatures(): { fund?: string; accept?: string; deliver?: string; review?: string; complete?: string } { return { ...this._txSignatures }; }
   
   // Domain Methods
-  fund(): void {
+  fund(txSignature?: string): void {
     if (this._status !== CommissionStatus.CREATED) {
       throw new Error('Commission must be created before funding');
     }
     this._status = CommissionStatus.FUNDED;
+    if (txSignature) this._txSignatures.fund = txSignature;
     this._updatedAt = new Date();
   }
 
-  accept(providerId: string): void {
+  accept(providerId: string, txSignature?: string): void {
     if (this._status !== CommissionStatus.FUNDED) {
       throw new Error('Commission must be funded before acceptance');
     }
@@ -144,6 +155,7 @@ export class Commission {
     }
     this._providerId = providerId;
     this._status = CommissionStatus.ACCEPTED;
+    if (txSignature) this._txSignatures.accept = txSignature;
     this._updatedAt = new Date();
   }
 
@@ -156,40 +168,44 @@ export class Commission {
     this._updatedAt = new Date();
   }
 
-  deliverWork(artworkUrl: string, hash: string): void {
+  deliverWork(artworkUrl: string, hash: string, txSignature?: string): void {
     if (this._status !== CommissionStatus.IN_PROGRESS) {
       throw new Error('Commission is not in progress');
     }
     this._finalArtwork = artworkUrl;
     this._finalArtworkHash = hash;
     this._status = CommissionStatus.DELIVERED;
+    if (txSignature) this._txSignatures.deliver = txSignature;
     this._updatedAt = new Date();
   }
 
-  review(rating: { score: number; review: string }): void {
+  review(rating: { score: number; review: string }, txSignature?: string): void {
     if (this._status !== CommissionStatus.DELIVERED) {
       throw new Error('Commission must be delivered before review');
     }
     this._ratingId = rating;
     this._status = CommissionStatus.REVIEWED;
+    if (txSignature) this._txSignatures.review = txSignature;
     this._updatedAt = new Date();
   }
 
-  complete(): void {
+  complete(txSignature?: string): void {
      if (this._status !== CommissionStatus.REVIEWED) {
        throw new Error('Commission must be reviewed before completion');
      }
      this._status = CommissionStatus.COMPLETED;
      this._completedAt = new Date();
+     if (txSignature) this._txSignatures.complete = txSignature;
      this._updatedAt = new Date();
   }
 
-  cancel(): void {
+  cancel(txSignature?: string): void {
     if (this._status === CommissionStatus.COMPLETED) {
       throw new Error('Cannot cancel completed commission');
     }
     this._status = CommissionStatus.CANCELLED;
     this._cancelledAt = new Date();
+    // Assuming cancel also has a tx on chain
     this._updatedAt = new Date();
   }
 
@@ -216,6 +232,7 @@ export class Commission {
       completedAt: this._completedAt,
       cancelledAt: this._cancelledAt,
       ratingId: this._ratingId,
+      txSignatures: this._txSignatures,
       createdAt: this._createdAt,
       updatedAt: this._updatedAt,
     };
