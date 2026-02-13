@@ -91,3 +91,31 @@
   background-color: #d9d9d9;
   cursor: not-allowed;
 }
+
+.uploadButton {
+  padding: 0 12px;
+  background-color: #f0f0f0;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: all 0.2s;
+}
+
+.uploadButton:hover {
+  background-color: #e6e6e6;
+  border-color: #d9d9d9;
+}
+
+.typingIndicator {
+  font-size: 12px;
+  color: #888;
+  font-style: italic;
+  margin-left: 8px;
+  margin-bottom: 4px;
+}
+
+.sharedImage {
+  display: block;
+  margin-top: 4px;
+}

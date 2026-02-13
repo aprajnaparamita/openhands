@@ -33,7 +33,7 @@ This documentation package contains everything needed to build a decentralized a
 | 04 | Projects | Lifecycle, State Machine | 4-5 days |
 | 05 | Smart Contracts | Solana, Escrow, Reputation | 5-7 days |
 | 06 | Reviews | Progressive Trust System | 3-4 days |
-| 07 | Chat | Real-time Messaging, WebSocket | 3-4 days |
+| 07 | Chat | Real-time Messaging, Pubnub | 3-4 days |
 | 08 | Admin | Dashboard, Moderation | 4-5 days |
 | 09 | Security | Rate Limiting, Validation | 3-4 days |
 | 10 | Frontend | React Components, UI/UX | 7-10 days |
