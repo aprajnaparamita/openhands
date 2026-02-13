@@ -11,6 +11,7 @@ import { ResetUser } from './components/ResetUser';
 import { EditProfile } from './components/EditProfile';
 import { ProfileView } from './components/ProfileView';
 import { BrowseArtists } from './components/BrowseArtists';
+import { BrowseProjects } from './components/BrowseProjects';
 import { MyAccount } from './components/MyAccount';
 import Header from './components/header';
 import OpenHands from './components/openhands';
@@ -72,6 +73,16 @@ function App() {
             element={
               isConnected ? (
                 <BrowseArtists />
+              ) : (
+                <Navigate to="/" replace />
+              )
+            }
+          />
+          <Route
+            path="/browse-projects"
+            element={
+              isConnected ? (
+                <BrowseProjects />
               ) : (
                 <Navigate to="/" replace />
               )

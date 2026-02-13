@@ -12,8 +12,18 @@ export const commissionApi = {
     return response.data.data;
   },
 
+  getAvailable: async (): Promise<Commission[]> => {
+    const response = await api.get('/commissions/available');
+    return response.data.data;
+  },
+
   getById: async (id: string): Promise<Commission> => {
     const response = await api.get(`/commissions/${id}`);
+    return response.data.data;
+  },
+
+  fund: async (id: string): Promise<Commission> => {
+    const response = await api.post(`/commissions/${id}/fund`);
     return response.data.data;
   },
 
@@ -24,6 +34,11 @@ export const commissionApi = {
 
   deliver: async (id: string, artworkUrl: string, hash: string): Promise<Commission> => {
     const response = await api.post(`/commissions/${id}/deliver`, { artworkUrl, hash });
+    return response.data.data;
+  },
+
+  review: async (id: string, score: number, review: string): Promise<Commission> => {
+    const response = await api.post(`/commissions/${id}/review`, { score, review });
     return response.data.data;
   },
 

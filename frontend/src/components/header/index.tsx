@@ -13,10 +13,13 @@ export default function Header() {
         </div>
         <div className={styles['nav-content']}>
           <Link to="/dashboard" className={styles['nav-item']}>
-            Projects
+            My Projects
+          </Link>
+          <Link to="/browse-projects" className={styles['nav-item']}>
+            Browse Projects
           </Link>
           <Link to="/browse-artists" className={styles['nav-item']}>
-            Artists
+            Browse Artists
           </Link>
           <Link to="/profile/edit" className={styles['nav-item']}>
             My Profile

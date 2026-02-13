@@ -24,16 +24,48 @@ export class CommissionsService {
     return this.commissionsRepository.save(commission);
   }
 
+  async fundCommission(commissionId: string, requesterId: string): Promise<Commission> {
+    const commission = await this.commissionsRepository.findById(commissionId);
+    if (!commission) throw new HttpException(404, 'Commission not found');
+    
+    if (commission.requesterId !== requesterId) {
+      throw new HttpException(403, 'Only the requester can fund this commission');
+    }
+
+    commission.fund();
+    return this.commissionsRepository.update(commissionId, commission) as Promise<Commission>;
+  }
+
   async acceptCommission(commissionId: string, providerId: string): Promise<Commission> {
     const commission = await this.commissionsRepository.findById(commissionId);
     if (!commission) throw new HttpException(404, 'Commission not found');
 
-    commission.accept(providerId);
-    // Auto-start work if accepted? Or separate step?
-    // User story: "Upon acceptance, escrow smart contract is activated"
-    // "Project-scoped chat"
+    // Eligibility Check: New providers (less than 3 completed) max 1 active project
+    const providerCommissions = await this.commissionsRepository.findByProviderId(providerId);
+    const activeCommissions = providerCommissions.filter(c => 
+      c.status === CommissionStatus.ACCEPTED || c.status === CommissionStatus.IN_PROGRESS
+    );
+    const completedCommissions = providerCommissions.filter(c => c.status === CommissionStatus.COMPLETED);
     
-    // We update the commission
+    const isNewProvider = completedCommissions.length < 3; 
+    
+    if (isNewProvider && activeCommissions.length >= 1) {
+       throw new HttpException(400, 'New providers can only have 1 active project');
+    }
+
+    commission.accept(providerId);
+    return this.commissionsRepository.update(commissionId, commission) as Promise<Commission>;
+  }
+
+  async reviewCommission(commissionId: string, userId: string, rating: { score: number; review: string }): Promise<Commission> {
+    const commission = await this.commissionsRepository.findById(commissionId);
+    if (!commission) throw new HttpException(404, 'Commission not found');
+
+    if (commission.requesterId !== userId) {
+      throw new HttpException(403, 'Only the requester can review the work');
+    }
+
+    commission.review(rating);
     return this.commissionsRepository.update(commissionId, commission) as Promise<Commission>;
   }
 
@@ -89,5 +121,9 @@ export class CommissionsService {
   
   async findUserCommissions(userId: string): Promise<Commission[]> {
     return this.commissionsRepository.findByUserId(userId);
+  }
+
+  async getAvailableCommissions(): Promise<Commission[]> {
+    return this.commissionsRepository.findAvailable();
   }
 }

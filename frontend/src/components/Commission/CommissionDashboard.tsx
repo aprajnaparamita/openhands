@@ -16,8 +16,10 @@ const CommissionCard: React.FC<{ commission: Commission }> = ({ commission }) =>
           ${commission.status === 'completed' ? 'bg-green-100 text-green-800' : 
             commission.status === 'in_progress' ? 'bg-blue-100 text-blue-800' :
             commission.status === 'delivered' ? 'bg-purple-100 text-purple-800' :
+            commission.status === 'reviewed' ? 'bg-pink-100 text-pink-800' :
             commission.status === 'accepted' ? 'bg-indigo-100 text-indigo-800' :
-            'bg-yellow-100 text-yellow-800'}`}>
+            commission.status === 'funded' ? 'bg-teal-100 text-teal-800' :
+            'bg-gray-100 text-gray-800'}`}>
           {commission.status.replace('_', ' ')}
         </span>
         <span className="text-gray-500 text-sm">{new Date(commission.createdAt).toLocaleDateString()}</span>
@@ -77,9 +79,9 @@ export const CommissionDashboard: React.FC = () => {
 
   if (loading) return <div className="p-8 text-center">Loading dashboard...</div>;
 
-  const requests = commissions.filter(c => c.status === 'pending');
-  const active = commissions.filter(c => ['accepted', 'in_progress'].includes(c.status));
-  const past = commissions.filter(c => ['delivered', 'completed', 'cancelled'].includes(c.status));
+  const requests = commissions.filter(c => ['created', 'funded'].includes(c.status));
+  const active = commissions.filter(c => ['accepted', 'in_progress', 'delivered', 'reviewed'].includes(c.status));
+  const past = commissions.filter(c => ['completed', 'cancelled'].includes(c.status));
 
   return (
     <div className="max-w-6xl mx-auto p-6">

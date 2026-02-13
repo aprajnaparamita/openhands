@@ -33,7 +33,7 @@ const commissionSchema = new Schema(
     status: {
       type: String,
       enum: Object.values(CommissionStatus),
-      default: CommissionStatus.PENDING,
+      default: CommissionStatus.CREATED,
     },
     price: {
       type: Number,
@@ -74,8 +74,7 @@ const commissionSchema = new Schema(
       default: null,
     },
     ratingId: {
-      type: String,
-      ref: 'Rating',
+      type: Schema.Types.Mixed,
       default: null,
     },
   },

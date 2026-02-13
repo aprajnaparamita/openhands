@@ -93,4 +93,36 @@ export class CommissionsController {
       next(error);
     }
   };
+
+  public getAvailableCommissions = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const commissions = await this.commissionsService.getAvailableCommissions();
+      res.status(200).json({ data: commissions, message: 'found' });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public fundCommission = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userReq = req as RequestWithUser;
+      const commissionId = req.params.id as string;
+      const updatedCommission = await this.commissionsService.fundCommission(commissionId, userReq.user.id);
+      res.status(200).json({ data: updatedCommission, message: 'funded' });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public reviewCommission = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userReq = req as RequestWithUser;
+      const commissionId = req.params.id as string;
+      const { score, review } = req.body;
+      const updatedCommission = await this.commissionsService.reviewCommission(commissionId, userReq.user.id, { score, review });
+      res.status(200).json({ data: updatedCommission, message: 'reviewed' });
+    } catch (error) {
+      next(error);
+    }
+  };
 }

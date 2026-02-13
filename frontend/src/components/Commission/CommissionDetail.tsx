@@ -15,6 +15,8 @@ export const CommissionDetail: React.FC = () => {
   const [chatToken, setChatToken] = useState<string | null>(null);
   const [deliveryFile, setDeliveryFile] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [reviewScore, setReviewScore] = useState(5);
+  const [reviewText, setReviewText] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -33,7 +35,8 @@ export const CommissionDetail: React.FC = () => {
 
         // If user is involved and status allows, get chat token
         if (
-          comm.status !== CommissionStatus.PENDING &&
+          comm.status !== CommissionStatus.CREATED &&
+          comm.status !== CommissionStatus.FUNDED &&
           (comm.requesterId === user.id || comm.providerId === user.id)
         ) {
           const token = await commissionApi.getChatToken(id);
@@ -49,6 +52,17 @@ export const CommissionDetail: React.FC = () => {
     fetchData();
   }, [id, address]);
 
+  const handleFund = async () => {
+    if (!id) return;
+    try {
+      const updated = await commissionApi.fund(id);
+      setCommission(updated);
+    } catch (error) {
+      console.error('Failed to fund:', error);
+      alert('Failed to fund project');
+    }
+  };
+
   const handleAccept = async () => {
     if (!id) return;
     try {
@@ -58,6 +72,18 @@ export const CommissionDetail: React.FC = () => {
       window.location.reload();
     } catch (error) {
       console.error('Failed to accept:', error);
+      alert('Failed to accept project. You may have reached your active project limit.');
+    }
+  };
+
+  const handleReviewSubmit = async () => {
+    if (!id) return;
+    try {
+      const updated = await commissionApi.review(id, reviewScore, reviewText);
+      setCommission(updated);
+    } catch (error) {
+      console.error('Failed to review:', error);
+      alert('Failed to submit review');
     }
   };
 
@@ -140,7 +166,16 @@ export const CommissionDetail: React.FC = () => {
         <div className="bg-white rounded-xl shadow-md p-6">
           <h3 className="text-lg font-bold mb-4">Project Status & Actions</h3>
           
-          {commission.status === CommissionStatus.PENDING && !isRequester && (
+          {commission.status === CommissionStatus.CREATED && isRequester && (
+            <button
+              onClick={handleFund}
+              className="w-full py-3 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 transition"
+            >
+              Fund Project (Escrow)
+            </button>
+          )}
+
+          {commission.status === CommissionStatus.FUNDED && !isRequester && (
             <button
               onClick={handleAccept}
               className="w-full py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition"
@@ -181,14 +216,44 @@ export const CommissionDetail: React.FC = () => {
                 )}
               </div>
               {isRequester && (
-                <button
-                  onClick={handleComplete}
-                  className="w-full py-3 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 transition"
-                >
-                  Approve & Release Payment
-                </button>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Rating (1-5)</label>
+                    <select 
+                      value={reviewScore} 
+                      onChange={(e) => setReviewScore(Number(e.target.value))}
+                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                    >
+                      {[5,4,3,2,1].map(n => <option key={n} value={n}>{n} Stars</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Review</label>
+                    <textarea
+                      value={reviewText}
+                      onChange={(e) => setReviewText(e.target.value)}
+                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                      rows={3}
+                    />
+                  </div>
+                  <button
+                    onClick={handleReviewSubmit}
+                    className="w-full py-3 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 transition"
+                  >
+                    Submit Review
+                  </button>
+                </div>
               )}
             </div>
+          )}
+
+          {commission.status === CommissionStatus.REVIEWED && isRequester && (
+             <button
+                onClick={handleComplete}
+                className="w-full py-3 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition"
+              >
+                Release Payment & Complete
+             </button>
           )}
         </div>
       </div>

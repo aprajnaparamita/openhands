@@ -2,11 +2,13 @@
 import crypto from 'crypto';
 
 export enum CommissionStatus {
-  PENDING = 'pending',
-  ACCEPTED = 'accepted', // Provider accepted, escrow funded
+  CREATED = 'created',
+  FUNDED = 'funded',
+  ACCEPTED = 'accepted',
   IN_PROGRESS = 'in_progress',
-  DELIVERED = 'delivered', // Provider uploaded final artwork
-  COMPLETED = 'completed', // Both reviewed, funds released
+  DELIVERED = 'delivered',
+  REVIEWED = 'reviewed',
+  COMPLETED = 'completed',
   CANCELLED = 'cancelled',
 }
 
@@ -78,7 +80,7 @@ export class Commission {
       data.description,
       data.requesterId,
       data.providerId,
-      CommissionStatus.PENDING,
+      CommissionStatus.CREATED,
       data.price,
       data.deadline,
       data.referenceImages
@@ -125,9 +127,17 @@ export class Commission {
   get completedAt(): Date | undefined { return this._completedAt ? new Date(this._completedAt) : undefined; }
   
   // Domain Methods
+  fund(): void {
+    if (this._status !== CommissionStatus.CREATED) {
+      throw new Error('Commission must be created before funding');
+    }
+    this._status = CommissionStatus.FUNDED;
+    this._updatedAt = new Date();
+  }
+
   accept(providerId: string): void {
-    if (this._status !== CommissionStatus.PENDING) {
-      throw new Error('Commission is not pending');
+    if (this._status !== CommissionStatus.FUNDED) {
+      throw new Error('Commission must be funded before acceptance');
     }
     if (this._providerId && this._providerId !== providerId) {
        throw new Error('Commission is assigned to another provider');
@@ -156,9 +166,18 @@ export class Commission {
     this._updatedAt = new Date();
   }
 
+  review(rating: { score: number; review: string }): void {
+    if (this._status !== CommissionStatus.DELIVERED) {
+      throw new Error('Commission must be delivered before review');
+    }
+    this._ratingId = rating;
+    this._status = CommissionStatus.REVIEWED;
+    this._updatedAt = new Date();
+  }
+
   complete(): void {
-     if (this._status !== CommissionStatus.DELIVERED) {
-       throw new Error('Commission must be delivered first');
+     if (this._status !== CommissionStatus.REVIEWED) {
+       throw new Error('Commission must be reviewed before completion');
      }
      this._status = CommissionStatus.COMPLETED;
      this._completedAt = new Date();

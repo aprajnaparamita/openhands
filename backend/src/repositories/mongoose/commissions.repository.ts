@@ -11,6 +11,7 @@ export interface ICommissionsRepository {
   update(id: string, commission: Commission): Promise<Commission | undefined>;
   findByUserId(userId: string): Promise<Commission[]>;
   findAllByUserId(userId: string): Promise<Commission[]>;
+  findAvailable(): Promise<Commission[]>;
 }
 
 @singleton()
@@ -77,6 +78,17 @@ export class MongooseCommissionsRepository implements ICommissionsRepository {
   async findAllByUserId(userId: string): Promise<Commission[]> {
     const commissions = await CommissionModel.find({
       $or: [{ requesterId: userId }, { providerId: userId }],
+    })
+      .sort({ createdAt: -1 })
+      .lean();
+    
+    return commissions.map(commission => Commission.fromPersistence(this.mapToPersistence(commission)));
+  }
+
+  async findAvailable(): Promise<Commission[]> {
+    const commissions = await CommissionModel.find({
+      status: CommissionStatus.FUNDED,
+      providerId: null,
     })
       .sort({ createdAt: -1 })
       .lean();

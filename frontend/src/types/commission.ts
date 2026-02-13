@@ -1,8 +1,10 @@
 export enum CommissionStatus {
-  PENDING = 'pending',
+  CREATED = 'created',
+  FUNDED = 'funded',
   ACCEPTED = 'accepted',
   IN_PROGRESS = 'in_progress',
   DELIVERED = 'delivered',
+  REVIEWED = 'reviewed',
   COMPLETED = 'completed',
   CANCELLED = 'cancelled',
 }

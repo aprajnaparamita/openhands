@@ -15,10 +15,13 @@ export class CommissionsRoute implements Routes {
   private initializeRoutes() {
     this.router.post(`${this.path}`, AuthMiddleware, this.commissionsController.createCommission);
     this.router.get(`${this.path}`, AuthMiddleware, this.commissionsController.getCommissions);
+    this.router.get(`${this.path}/available`, AuthMiddleware, this.commissionsController.getAvailableCommissions);
     this.router.get(`${this.path}/upload-signature`, AuthMiddleware, this.commissionsController.getUploadSignature);
     this.router.get(`${this.path}/:id`, AuthMiddleware, this.commissionsController.getCommissionById);
+    this.router.post(`${this.path}/:id/fund`, AuthMiddleware, this.commissionsController.fundCommission);
     this.router.post(`${this.path}/:id/accept`, AuthMiddleware, this.commissionsController.acceptCommission);
     this.router.post(`${this.path}/:id/deliver`, AuthMiddleware, this.commissionsController.deliverWork);
+    this.router.post(`${this.path}/:id/review`, AuthMiddleware, this.commissionsController.reviewCommission);
     this.router.post(`${this.path}/:id/complete`, AuthMiddleware, this.commissionsController.completeCommission);
     this.router.get(`${this.path}/:id/chat-token`, AuthMiddleware, this.commissionsController.getChatToken);
   }
