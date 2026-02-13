@@ -1,0 +1,227 @@
+lockdown-install.js:1 SES Removing unpermitted intrinsics
+useAuthCheck.ts:20 [useAuthCheck] Checking profile for 0xb9c25dF9Cb6df36ecCaabadFa58B0fF7d4413A4d at http://localhost:3000/api/v1/users/0xb9c25dF9Cb6df36ecCaabadFa58B0fF7d4413A4d
+useAuthCheck.ts:20 [useAuthCheck] Checking profile for 0xb9c25dF9Cb6df36ecCaabadFa58B0fF7d4413A4d at http://localhost:3000/api/v1/users/0xb9c25dF9Cb6df36ecCaabadFa58B0fF7d4413A4d
+installHook.js:1 styled-components: it looks like an unknown prop "top" is being sent through to the DOM, which will likely trigger a React console error. If you would like automatic filtering of unknown props, you can opt-into that behavior via `<StyleSheetManager shouldForwardProp={...}>` (connect an API like `@emotion/is-prop-valid`) or consider using transient props (`$` prefix for automatic filtering.) Error Component Stack
+    at D (StyledComponent.ts:219:1)
+    at ChainDropdown (index.tsx:26:1)
+    at div (<anonymous>)
+    at D (StyledComponent.ts:219:1)
+    at ConnectedWidget (index.tsx:32:1)
+    at div (<anonymous>)
+    at MotionDOMComponent (index.tsx:101:1)
+    at D (StyledComponent.ts:219:1)
+    at ConnectButton (index.tsx:16:1)
+    at div (<anonymous>)
+    at nav (<anonymous>)
+    at header (<anonymous>)
+    at Header (<anonymous>)
+    at div (<anonymous>)
+    at App (App.tsx:27:1)
+    at Web3Provder (index.tsx:13:1)
+    at _i (chunk-HYHSDRQI.mjs:214:1)
+    at Yu (chunk-HYHSDRQI.mjs:214:1)
+    at ConnectKitProvider (index.tsx:29:1)
+    at ParticleConnectkit (connectkit.tsx:89:1)
+    at Router (chunk-JZWAC4HX.mjs:6594:1)
+    at BrowserRouter (chunk-JZWAC4HX.mjs:9830:1)
+    at PubNubProvider (PubNubProvider.tsx:19:1)
+    at Suspense (<anonymous>)
+overrideMethod @ installHook.js:1
+:3000/api/v1/users/0xb9c25dF9Cb6df36ecCaabadFa58B0fF7d4413A4d:1  Failed to load resource: the server responded with a status of 404 (Not Found)
+useAuthCheck.ts:24 [useAuthCheck] Response status: 404
+useAuthCheck.ts:28 [useAuthCheck] User not found (404). Checking if redirect needed...
+useAuthCheck.ts:31 [useAuthCheck] Redirecting to /profile/setup
+:3000/api/v1/users/0xb9c25dF9Cb6df36ecCaabadFa58B0fF7d4413A4d:1  Failed to load resource: the server responded with a status of 404 (Not Found)
+useAuthCheck.ts:24 [useAuthCheck] Response status: 404
+useAuthCheck.ts:28 [useAuthCheck] User not found (404). Checking if redirect needed...
+useAuthCheck.ts:20 [useAuthCheck] Checking profile for 0xb9c25dF9Cb6df36ecCaabadFa58B0fF7d4413A4d at http://localhost:3000/api/v1/users/0xb9c25dF9Cb6df36ecCaabadFa58B0fF7d4413A4d
+:3000/api/v1/users/0xb9c25dF9Cb6df36ecCaabadFa58B0fF7d4413A4d:1  Failed to load resource: the server responded with a status of 404 (Not Found)
+:3000/api/v1/users/0xb9c25dF9Cb6df36ecCaabadFa58B0fF7d4413A4d:1  Failed to load resource: the server responded with a status of 404 (Not Found)
+useAuthCheck.ts:24 [useAuthCheck] Response status: 404
+useAuthCheck.ts:28 [useAuthCheck] User not found (404). Checking if redirect needed...
+:3000/api/v1/users/0xb9c25dF9Cb6df36ecCaabadFa58B0fF7d4413A4d:1  Failed to load resource: the server responded with a status of 404 (Not Found)
+ProfileSetup.tsx:50 [ProfileSetup] Starting profile update...
+ProfileSetup.tsx:51 [ProfileSetup] PUT URL: http://localhost:3000/api/v1/users/0xb9c25dF9Cb6df36ecCaabadFa58B0fF7d4413A4d
+ProfileSetup.tsx:52 [ProfileSetup] Payload: {role: 'artist', name: 'Dara', bio: 'test', address: '0xb9c25dF9Cb6df36ecCaabadFa58B0fF7d4413A4d'}
+ProfileSetup.tsx:73 [ProfileSetup] Response Status: 200 OK
+ProfileSetup.tsx:75 [ProfileSetup] Response Data: {data: {…}, message: 'update'}
+ProfileSetup.tsx:82 [ProfileSetup] Profile saved successfully. Initiating navigation to /dashboard...
+ProfileSetup.tsx:87 [ProfileSetup] Navigating now.
+useAuthCheck.ts:20 [useAuthCheck] Checking profile for 0xb9c25dF9Cb6df36ecCaabadFa58B0fF7d4413A4d at http://localhost:3000/api/v1/users/0xb9c25dF9Cb6df36ecCaabadFa58B0fF7d4413A4d
+client.ts:13 [API Request] GET /users/0xb9c25dF9Cb6df36ecCaabadFa58B0fF7d4413A4d 
+client.ts:13 [API Request] GET /commissions 
+client.ts:13 [API Request] GET /users/0xb9c25dF9Cb6df36ecCaabadFa58B0fF7d4413A4d 
+client.ts:13 [API Request] GET /commissions 
+useAuthCheck.ts:24 [useAuthCheck] Response status: 200
+useAuthCheck.ts:40 [useAuthCheck] User data received: {data: {…}, message: 'findById'}data: createdAt: "2026-02-09T14:23:14.650Z"id: "5340ab36-00f7-401f-8f6a-20ef90ec504c"updatedAt: "2026-02-09T14:23:14.650Z"walletAddress: "0xb9c25dF9Cb6df36ecCaabadFa58B0fF7d4413A4d"[[Prototype]]: Objectmessage: "findById"[[Prototype]]: Object
+useAuthCheck.ts:42 [useAuthCheck] Has role? false
+useAuthCheck.ts:46 [useAuthCheck] Profile incomplete. Redirecting to setup if needed.
+useAuthCheck.ts:20 [useAuthCheck] Checking profile for 0xb9c25dF9Cb6df36ecCaabadFa58B0fF7d4413A4d at http://localhost:3000/api/v1/users/0xb9c25dF9Cb6df36ecCaabadFa58B0fF7d4413A4d
+client.ts:25 [API Response] 200 /users/0xb9c25dF9Cb6df36ecCaabadFa58B0fF7d4413A4d {data: {…}, message: 'findById'}
+client.ts:25 [API Response] 200 /users/0xb9c25dF9Cb6df36ecCaabadFa58B0fF7d4413A4d {data: {…}, message: 'findById'}
+useAuthCheck.ts:24 [useAuthCheck] Response status: 200
+useAuthCheck.ts:40 [useAuthCheck] User data received: {data: {…}, message: 'findById'}
+useAuthCheck.ts:42 [useAuthCheck] Has role? false
+useAuthCheck.ts:46 [useAuthCheck] Profile incomplete. Redirecting to setup if needed.
+commissions.ts:11  GET http://localhost:3000/api/v1/commissions 500 (Internal Server Error)
+dispatchXhrRequest @ xhr.js:198
+xhr @ xhr.js:15
+dispatchRequest @ dispatchRequest.js:51
+Promise.then
+_request @ Axios.js:172
+request @ Axios.js:41
+(anonymous) @ Axios.js:220
+wrap @ bind.js:12
+getAll @ commissions.ts:11
+loadData @ CommissionDashboard.tsx:63
+(anonymous) @ CommissionDashboard.tsx:75
+commitHookEffectListMount @ react-dom.development.js:23150
+commitPassiveMountOnFiber @ react-dom.development.js:24926
+commitPassiveMountEffects_complete @ react-dom.development.js:24891
+commitPassiveMountEffects_begin @ react-dom.development.js:24878
+commitPassiveMountEffects @ react-dom.development.js:24866
+flushPassiveEffectsImpl @ react-dom.development.js:27039
+flushPassiveEffects @ react-dom.development.js:26984
+performSyncWorkOnRoot @ react-dom.development.js:26076
+flushSyncCallbacks @ react-dom.development.js:12042
+commitRootImpl @ react-dom.development.js:26959
+commitRoot @ react-dom.development.js:26682
+finishConcurrentRender @ react-dom.development.js:25981
+performConcurrentWorkOnRoot @ react-dom.development.js:25809
+workLoop @ scheduler.development.js:266
+flushWork @ scheduler.development.js:239
+performWorkUntilDeadline @ scheduler.development.js:533
+installHook.js:1 [API Response Error] 500 /commissions {success: false, error: {…}}
+overrideMethod @ installHook.js:1
+(anonymous) @ client.ts:32
+Promise.then
+_request @ Axios.js:172
+request @ Axios.js:41
+(anonymous) @ Axios.js:220
+wrap @ bind.js:12
+getAll @ commissions.ts:11
+loadData @ CommissionDashboard.tsx:63
+(anonymous) @ CommissionDashboard.tsx:75
+commitHookEffectListMount @ react-dom.development.js:23150
+commitPassiveMountOnFiber @ react-dom.development.js:24926
+commitPassiveMountEffects_complete @ react-dom.development.js:24891
+commitPassiveMountEffects_begin @ react-dom.development.js:24878
+commitPassiveMountEffects @ react-dom.development.js:24866
+flushPassiveEffectsImpl @ react-dom.development.js:27039
+flushPassiveEffects @ react-dom.development.js:26984
+performSyncWorkOnRoot @ react-dom.development.js:26076
+flushSyncCallbacks @ react-dom.development.js:12042
+commitRootImpl @ react-dom.development.js:26959
+commitRoot @ react-dom.development.js:26682
+finishConcurrentRender @ react-dom.development.js:25981
+performConcurrentWorkOnRoot @ react-dom.development.js:25809
+workLoop @ scheduler.development.js:266
+flushWork @ scheduler.development.js:239
+performWorkUntilDeadline @ scheduler.development.js:533
+installHook.js:1 Failed to load dashboard data AxiosError: Request failed with status code 500
+    at settle (settle.js:19:1)
+    at XMLHttpRequest.onloadend (xhr.js:59:1)
+    at Axios.request (Axios.js:46:1)
+    at async Object.getAll (commissions.ts:11:1)
+    at async Promise.all (index 1)
+    at async loadData (CommissionDashboard.tsx:63:1)
+overrideMethod @ installHook.js:1
+loadData @ CommissionDashboard.tsx:70
+await in loadData
+(anonymous) @ CommissionDashboard.tsx:75
+commitHookEffectListMount @ react-dom.development.js:23150
+commitPassiveMountOnFiber @ react-dom.development.js:24926
+commitPassiveMountEffects_complete @ react-dom.development.js:24891
+commitPassiveMountEffects_begin @ react-dom.development.js:24878
+commitPassiveMountEffects @ react-dom.development.js:24866
+flushPassiveEffectsImpl @ react-dom.development.js:27039
+flushPassiveEffects @ react-dom.development.js:26984
+performSyncWorkOnRoot @ react-dom.development.js:26076
+flushSyncCallbacks @ react-dom.development.js:12042
+commitRootImpl @ react-dom.development.js:26959
+commitRoot @ react-dom.development.js:26682
+finishConcurrentRender @ react-dom.development.js:25981
+performConcurrentWorkOnRoot @ react-dom.development.js:25809
+workLoop @ scheduler.development.js:266
+flushWork @ scheduler.development.js:239
+performWorkUntilDeadline @ scheduler.development.js:533
+commissions.ts:11  GET http://localhost:3000/api/v1/commissions 500 (Internal Server Error)
+dispatchXhrRequest @ xhr.js:198
+xhr @ xhr.js:15
+dispatchRequest @ dispatchRequest.js:51
+Promise.then
+_request @ Axios.js:172
+request @ Axios.js:41
+(anonymous) @ Axios.js:220
+wrap @ bind.js:12
+getAll @ commissions.ts:11
+loadData @ CommissionDashboard.tsx:63
+(anonymous) @ CommissionDashboard.tsx:75
+commitHookEffectListMount @ react-dom.development.js:23150
+invokePassiveEffectMountInDEV @ react-dom.development.js:25154
+invokeEffectsInDev @ react-dom.development.js:27351
+commitDoubleInvokeEffectsInDEV @ react-dom.development.js:27330
+flushPassiveEffectsImpl @ react-dom.development.js:27056
+flushPassiveEffects @ react-dom.development.js:26984
+performSyncWorkOnRoot @ react-dom.development.js:26076
+flushSyncCallbacks @ react-dom.development.js:12042
+commitRootImpl @ react-dom.development.js:26959
+commitRoot @ react-dom.development.js:26682
+finishConcurrentRender @ react-dom.development.js:25981
+performConcurrentWorkOnRoot @ react-dom.development.js:25809
+workLoop @ scheduler.development.js:266
+flushWork @ scheduler.development.js:239
+performWorkUntilDeadline @ scheduler.development.js:533
+installHook.js:1 [API Response Error] 500 /commissions {success: false, error: {…}}
+overrideMethod @ installHook.js:1
+(anonymous) @ client.ts:32
+Promise.then
+_request @ Axios.js:172
+request @ Axios.js:41
+(anonymous) @ Axios.js:220
+wrap @ bind.js:12
+getAll @ commissions.ts:11
+loadData @ CommissionDashboard.tsx:63
+(anonymous) @ CommissionDashboard.tsx:75
+commitHookEffectListMount @ react-dom.development.js:23150
+invokePassiveEffectMountInDEV @ react-dom.development.js:25154
+invokeEffectsInDev @ react-dom.development.js:27351
+commitDoubleInvokeEffectsInDEV @ react-dom.development.js:27330
+flushPassiveEffectsImpl @ react-dom.development.js:27056
+flushPassiveEffects @ react-dom.development.js:26984
+performSyncWorkOnRoot @ react-dom.development.js:26076
+flushSyncCallbacks @ react-dom.development.js:12042
+commitRootImpl @ react-dom.development.js:26959
+commitRoot @ react-dom.development.js:26682
+finishConcurrentRender @ react-dom.development.js:25981
+performConcurrentWorkOnRoot @ react-dom.development.js:25809
+workLoop @ scheduler.development.js:266
+flushWork @ scheduler.development.js:239
+performWorkUntilDeadline @ scheduler.development.js:533
+installHook.js:1 Failed to load dashboard data AxiosError: Request failed with status code 500
+    at settle (settle.js:19:1)
+    at XMLHttpRequest.onloadend (xhr.js:59:1)
+    at Axios.request (Axios.js:46:1)
+    at async Object.getAll (commissions.ts:11:1)
+    at async Promise.all (index 1)
+    at async loadData (CommissionDashboard.tsx:63:1)
+overrideMethod @ installHook.js:1
+loadData @ CommissionDashboard.tsx:70
+await in loadData
+(anonymous) @ CommissionDashboard.tsx:75
+commitHookEffectListMount @ react-dom.development.js:23150
+invokePassiveEffectMountInDEV @ react-dom.development.js:25154
+invokeEffectsInDev @ react-dom.development.js:27351
+commitDoubleInvokeEffectsInDEV @ react-dom.development.js:27330
+flushPassiveEffectsImpl @ react-dom.development.js:27056
+flushPassiveEffects @ react-dom.development.js:26984
+performSyncWorkOnRoot @ react-dom.development.js:26076
+flushSyncCallbacks @ react-dom.development.js:12042
+commitRootImpl @ react-dom.development.js:26959
+commitRoot @ react-dom.development.js:26682
+finishConcurrentRender @ react-dom.development.js:25981
+performConcurrentWorkOnRoot @ react-dom.development.js:25809
+workLoop @ scheduler.development.js:266
+flushWork @ scheduler.development.js:239
+performWorkUntilDeadline @ scheduler.development.js:533
+

@@ -1,42 +1,43 @@
 import { z } from 'zod';
 
-// Email Schema - Matches Entity validation rules
-export const emailSchema = z
+// Wallet Address Schema
+export const walletAddressSchema = z
   .string()
-  .min(1, { message: 'Email is required' })
-  .max(254, { message: 'Email is too long (max 254 characters)' })
-  .email({ message: 'Invalid email format' })
-  .transform((email) => email.toLowerCase().trim());
+  .regex(/^0x[a-fA-F0-9]{40}$/, { message: 'Invalid wallet address format' });
 
-// Password Schema - Matches Entity validation rules
-export const passwordSchema = z
-  .string()
-  .min(8, { message: 'Password must be at least 8 characters long' })
-  .max(128, { message: 'Password is too long (max 128 characters)' })
-  .refine((password) => /\d/.test(password) && /[a-zA-Z]/.test(password), {
-    message: 'Password must contain at least one letter and one number',
-  });
+// Role Schema
+export const roleSchema = z.enum(['artist', 'requester', 'admin']);
 
-// Signup/Login DTO
+// Profile Fields
+export const nameSchema = z.string().max(100).optional();
+export const bioSchema = z.string().max(1000).optional();
+export const profileImageSchema = z.string().url().optional();
+export const headerImageSchema = z.string().url().optional();
+export const portfolioSchema = z.array(z.string().url()).optional();
+
+// Create User DTO
 export const createUserSchema = z.object({
-  email: emailSchema,
-  password: passwordSchema,
+  walletAddress: walletAddressSchema,
+  role: roleSchema.optional(),
+  name: nameSchema,
+  bio: bioSchema,
+  profileImage: profileImageSchema,
+  headerImage: headerImageSchema,
+  portfolio: portfolioSchema,
 });
 
 export type CreateUserDto = z.infer<typeof createUserSchema>;
 
-// Login DTO (Same but explicitly separated)
-export const loginUserSchema = z.object({
-  email: emailSchema,
-  password: z.string().min(1, { message: 'Password is required' }), // Skip existing password validation during login
-});
-
-export type LoginUserDto = z.infer<typeof loginUserSchema>;
-
-// Update DTO (All fields optional)
+// Update User DTO (All fields optional)
 export const updateUserSchema = z.object({
-  email: emailSchema.optional(),
-  password: passwordSchema.optional(),
+  walletAddress: walletAddressSchema.optional(),
+  role: roleSchema.optional(),
+  name: nameSchema,
+  bio: bioSchema,
+  profileImage: profileImageSchema,
+  headerImage: headerImageSchema,
+  portfolio: portfolioSchema,
 });
 
 export type UpdateUserDto = z.infer<typeof updateUserSchema>;
+

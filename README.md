@@ -1,207 +1,185 @@
-![Portfolio Image](./about/out-043.jpg)
-
-# Decentralized Art Commission Platform for Displaced Artists
-
-## Background & Motivation
-
-On the weekends I do volunteer work with **[Tzu Chi](https://global.tzuchi.org/)**, I worked closely with refugee families and came to understand the severe constraints they face in host countries. Many refugees are legally prohibited from working, despite having time, skill, and strong motivation to contribute. This creates a crushing pressure: talent without a legal or economic outlet.
-
-Art became a natural bridge. By providing art supplies, I discovered several individuals with exceptional artistic ability such as [Mirab Tariq](./about/Mirab_portfolio.pdf). (She was recently honored with a full-ride scholarship to the Kansas City Art Institute.) However, they have no way to safely connect with patrons, no ability to receive payments, and no trusted system to protect them from exploitation. Traditional platforms fail this population due to identity requirements, banking restrictions, and jurisdictional barriers.
-
-This project proposes a **decentralized art-commission platform** that allows displaced artists to accept project-based art commissions in a way that is non-custodial, reputation-driven, and respectful of legal boundaries.
-
-![Portfolio Image](./about/out-041.jpg)
-
-## Core Concept
-
-The platform enables **requesters** to commission artwork and **providers** (displaced artists) to deliver completed pieces under clearly defined terms. Payments are handled via cryptocurrency escrow, avoiding cash handling or employment classification.
-
-The system is designed around:
-
-- Trust minimization  
-- Progressive reputation  
-- Non-custodial payments  
-- Minimal personal data collection  
-- Strong abuse and spam prevention  
-
-![Portfolio Image](./about/out-022.jpg)
-
-## Authentication & Identity
-
-Authentication is handled using **[Particle Network](https://particle.network)** enabling:
-
-- Email or wallet-based login  
-- Wallet abstraction for non-technical users  
-- Cross-chain identity linkage  
-
-After authentication, the backend issues **JWTs** with scoped permissions. Tokens are short-lived, rotated securely, and never expose sensitive user data. Wallet addresses serve as the primary identity anchor; real names are never required.
-
-![Portfolio Image](./about/out-039.jpg)
-
-## Backend Architecture
-
-The backend is built with **[Express](https://expressjs.com)** using a strict **Clean / Onion Architecture**:
-
-- **Domain layer**: pure business rules (projects, reviews, eligibility)  
-- **Application layer**: use cases and orchestration  
-- **Infrastructure layer**: MongoDB, blockchain adapters, storage, CAPTCHA  
-- **Presentation layer**: Express routes and controllers only  
-
-Data is stored in **[MongoDB](https://www.mongodb.com)**, chosen for its flexibility with user profiles, portfolios, chats, and project metadata.
-
-No domain logic depends on Express, MongoDB, JWTs, or blockchain libraries.
-
-![Portfolio Image](./about/out-044.jpg)
-
-## Provider Profiles & Portfolios
-
-Each provider has a **public profile page** that includes:
-
-- Profile image  
-- Header image  
-- Display name and biography  
-- Uploadable art portfolio (multiple works with titles and descriptions)  
-
-All images are uploaded via signed URLs to cloud object storage, with:
-
-- MIME type validation  
-- File size limits  
-- EXIF metadata stripping  
-- Virus scanning  
-- NudeNet scanning with admin notification
-
-This allows artists to showcase their work without exposing personal or legal identifiers.
-
-![Portfolio Image](./about/out-013.jpg)
-
-## Project Flow
-
-1. **Requester creates a project**
-   - Uploads reference images  
-   - Provides a description  
-   - Funds escrow using tokens or stablecoins  
-
-2. **Provider accepts terms**
-   - Eligibility is checked (review status & concurrency rules)  
-   - Smart contract escrow is activated  
-
-3. **Chat-based collaboration**
-   - Project-scoped chat  
-   - Image uploads supported for drafts and references  
-
-4. **Delivery**
-   - Provider uploads final artwork  
-   - Content hash recorded for integrity  
-
-5. **Review & Completion**
-   - Both parties must submit reviews  
-   - Funds are released to the provider  
-
-![Portfolio Image](./about/out-002.jpg)
-
-## Review & Reputation System
-
-The platform enforces **mandatory reviews** to protect both parties.
-
-### Review Rules
-
-- **Before 3 completed projects**:
-  - Provider may only handle **one active project**  
-  - Reviews are required **before and after** each project  
-  - No new projects can be accepted until reviews are completed  
-
-- **After 3 completed reviews**:
-  - Provider may accept **multiple concurrent projects**  
-  - Reviews remain required, but are no longer blocking  
-
-This creates a gradual trust curve while preventing early exploitation or abuse.
-
-![Portfolio Image](./about/out-042.jpg)
-
-## Blockchain & Payments
-
-Payments and escrow logic are implemented using:
-
-- **[Solana](https://solana.com)** for fast, low-cost transfers  
-- EVM-compatible smart contracts for escrow, project state, and reputation logic  
-
-Funds are never held by the platform. Escrow contracts release payments only when delivery and review conditions are satisfied.
-
-All smart contracts undergo:
-
-- Static analysis  
-- Fuzz testing  
-- Independent third-party security audits  
-
-![Portfolio Image](./about/out-033.jpg)
-
-## Anti-Abuse & Spam Prevention
-
-To prevent account farming and spam:
-
-- CAPTCHA is required during account creation and sensitive actions  
-- Rate limiting enforced via middleware  
-- Wallet + Particle identity binding  
-- Review-gated progression limits abuse incentives  
-
-![Portfolio Image](./about/out-011.jpg)
-
-## Testing & CI/CD
-
-The system includes:
-
-- Unit tests for domain logic  
-- Integration tests for API and database  
-- Smart contract tests  
-- End-to-end user flow tests  
-
-Continuous integration ensures:
-
-- Type safety  
-- Linting and formatting  
-- Contract test execution  
-- Security checks before deployment  
-
-
-![Portfolio Image](./about/out-012.jpg)
-
-## Legal & Ethical Positioning
-
-The platform:
-
-- Does not classify providers as employees  
-- Frames work strictly as **art commissions**  
-- Avoids collecting sensitive personal or legal status data  
-- Uses wallet-based identity rather than government documents  
-
-This minimizes risk while preserving dignity, autonomy, and safety for providers.
-
-![Portfolio Image](./about/out-019.jpg)
-
-## Getting Started
-
-First, create and configure the `.env` file by referring to the `.env.sample`.
+# Decentralized Art Commission Platform
+
+## Complete System Design & Implementation Guide
+
+This documentation package contains everything needed to build a decentralized art commission platform that empowers displaced artists through blockchain technology.
+
+### 📚 Documentation Structure
+
+- **README.md** (this file) - Project overview and navigation
+- **ARCHITECTURE.md** - System architecture and design decisions  
+- **TECH_STACK.md** - Complete technology stack with rationale
+- **SECURITY.md** - Comprehensive security guidelines
+- **CONTRIBUTING.md** - Development workflow and standards
+- **prompts/** - 12 detailed implementation prompts
+- **diagrams/** - Architecture diagrams and flowcharts
+- **deployment/** - Environment setup and deployment guides
+
+### 🚀 Quick Start
+
+1. Read ARCHITECTURE.md for system overview
+2. Review TECH_STACK.md for technology decisions
+3. Follow implementation prompts in order (01-12)
+4. Reference SECURITY.md throughout development
+5. Use deployment guides for environment setup
+
+### 📋 Implementation Prompts
+
+| # | Topic | Focus | Est. Time |
+|---|-------|-------|-----------|
+| 01 | Project Setup | Monorepo, Config, Docker | 1-2 days |
+| 02 | Authentication | Wallet Auth, JWT, Sessions | 2-3 days |
+| 03 | User Profiles | Portfolio, Media Upload | 3-4 days |
+| 04 | Projects | Lifecycle, State Machine | 4-5 days |
+| 05 | Smart Contracts | Solana, Escrow, Reputation | 5-7 days |
+| 06 | Reviews | Progressive Trust System | 3-4 days |
+| 07 | Chat | Real-time Messaging, WebSocket | 3-4 days |
+| 08 | Admin | Dashboard, Moderation | 4-5 days |
+| 09 | Security | Rate Limiting, Validation | 3-4 days |
+| 10 | Frontend | React Components, UI/UX | 7-10 days |
+| 11 | Testing | Unit, Integration, E2E | 5-7 days |
+| 12 | DevOps | CI/CD, Monitoring, Deploy | 5-7 days |
+
+**Total**: 45-60 days for complete implementation
+
+### 🎯 Key Features
+
+- **Wallet-Based Identity**: No personal documents required
+- **Smart Contract Escrow**: Non-custodial, automatic payment release
+- **Progressive Reputation**: New artists limited to 1 project until proven
+- **Privacy-First**: Minimal data collection, pseudonymous profiles
+- **Real-time Chat**: Project-scoped messaging with media sharing
+- **Content Moderation**: Automated + human oversight
+
+### 🔧 Technology Stack
+
+- **Frontend**: React 18 + TypeScript + TailwindCSS
+- **Backend**: Node.js + Express + MongoDB
+- **Blockchain**: Solana (Anchor framework)
+- **Auth**: Particle Network wallet abstraction  
+- **Storage**: S3-compatible object storage
+- **Testing**: Jest + Playwright + Anchor tests
+- **DevOps**: Docker + Kubernetes + GitHub Actions
+
+### 📊 System Architecture
 
 ```
-# Particle Project Config, learn more info:  https://dashboard.particle.network/
-REACT_APP_PROJECT_ID=xxxx
-REACT_APP_CLIENT_KEY=xxxx
-REACT_APP_APP_ID=xxxx
-
-# WalletConnect Project Id, learn more info: https://cloud.walletconnect.com/
-REACT_APP_WALLETCONNECT_PROJECT_ID=xxxx
+┌─────────────────────────────────────────┐
+│         Frontend (React + TS)           │
+│  - Wallet Auth  - Chat  - Profiles     │
+└──────────────┬──────────────────────────┘
+               │ REST API / WebSocket
+┌──────────────▼──────────────────────────┐
+│      Backend (Express + Clean Arch)     │
+│  - Domain  - Use Cases  - Repos        │
+└──┬────────┬────────┬────────────────────┘
+   │        │        │
+   ▼        ▼        ▼
+MongoDB   Redis   Solana (Smart Contracts)
 ```
 
-Run the development server:
+### 🛡️ Security Highlights
 
-```bash
-npm run start
-# or
-yarn start
-# or
-pnpm start
-# or
-bun start
-```
+- Multi-layer rate limiting
+- Content moderation (virus + inappropriate content scanning)
+- JWT with refresh token rotation
+- Input validation and sanitization
+- Smart contract security audit required
+- Comprehensive monitoring and alerting
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 👥 User Roles
+
+- **Requester**: Creates and funds art commission projects
+- **Provider (Artist)**: Accepts projects and delivers artwork  
+- **Admin**: Moderates content and resolves disputes
+
+### 💡 Progressive Trust Model
+
+**New Artists** (< 3 reviews):
+- Limited to 1 active project
+- Must complete reviews before accepting new work
+- Builds reputation safely
+
+**Established Artists** (≥ 3 reviews):
+- Unlimited concurrent projects
+- Proven track record
+- Reviews still required but non-blocking
+
+### 📖 How to Use This Documentation
+
+**For Product Managers:**
+- Start with ARCHITECTURE.md
+- Review feature specs in prompts/
+- Understand flows in diagrams/
+
+**For Developers:**
+- Review TECH_STACK.md
+- Follow prompts/ in sequence
+- Check SECURITY.md for requirements
+- Reference CONTRIBUTING.md for standards
+
+**For DevOps:**
+- Study deployment/ guides
+- Review prompt 12 (DevOps)
+- Check diagrams/deployment.md
+
+**For Security Auditors:**
+- Read SECURITY.md comprehensively
+- Review prompt 05 (Smart Contracts)
+- Check prompt 09 (Security Measures)
+
+### 🗂️ Project Phases
+
+**Phase 1: MVP** (Months 1-3)
+- Basic auth and profiles
+- Simple project management
+- Manual payments
+- Basic chat and reviews
+
+**Phase 2: Blockchain** (Months 4-6)  
+- Smart contract development
+- Automated escrow
+- On-chain reputation
+- Security hardening
+
+**Phase 3: Scale** (Months 7-9)
+- Admin dashboard
+- Advanced features
+- Performance optimization
+- Mobile responsiveness
+
+**Phase 4: Launch** (Month 10+)
+- Security audit
+- Beta testing  
+- Production deployment
+- Marketing and growth
+
+### 🤝 Contributing
+
+See CONTRIBUTING.md for:
+- Development workflow
+- Coding standards
+- Testing requirements
+- Pull request process
+
+### 📄 License
+
+MIT License - See LICENSE file
+
+### 📞 Contact
+
+- **Issues**: GitHub Issues
+- **Security**: security@example.com
+- **General**: hello@example.com
+
+### 🙏 Acknowledgments
+
+- Inspired by volunteer work with Tzu Chi Foundation
+- Built to empower displaced artists
+- Reference: OpenHands codebase patterns
+
+---
+
+**Documentation Version**: 1.0.0  
+**Last Updated**: 2026-02-13
+**Generated**: Automated documentation package
