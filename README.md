@@ -57,7 +57,7 @@ This documentation package contains everything needed to build a decentralized a
 - **Backend**: Node.js + Express + MongoDB
 - **Blockchain**: Solana (Anchor framework)
 - **Auth**: Particle Network wallet abstraction  
-- **Storage**: S3-compatible object storage
+- **Storage**: Cloudinary
 - **Testing**: Jest + Playwright + Anchor tests
 - **DevOps**: Docker + Kubernetes + GitHub Actions
 

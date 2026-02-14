@@ -14,7 +14,6 @@ Production infrastructure, CI/CD, monitoring, and operations.
 - Kubernetes deployment
 - MongoDB Atlas
 - Redis Cloud
-- S3 + CloudFront CDN
 
 ### CI/CD Pipeline
 ```

@@ -8,9 +8,11 @@ import hpp from 'hpp';
 import mongoSanitize from 'express-mongo-sanitize';
 import xss from 'xss-clean';
 import morgan from 'morgan';
+import * as Sentry from '@sentry/node';
+import { nodeProfilingIntegration } from '@sentry/profiling-node';
 import swaggerJSDoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
-import { NODE_ENV, PORT, LOG_FORMAT, CREDENTIALS, CORS_ORIGIN_LIST, API_SERVER_URL } from '@config/env';
+import { NODE_ENV, PORT, LOG_FORMAT, CREDENTIALS, CORS_ORIGIN_LIST, API_SERVER_URL, SENTRY_DSN } from '@config/env';
 import { Routes } from '@interfaces/routes.interface';
 import { ErrorMiddleware } from '@middlewares/error.middleware';
 import { NotFoundMiddleware } from '@middlewares/notFound.middleware';
@@ -26,10 +28,12 @@ class App {
     this.env = NODE_ENV || 'development';
     this.port = PORT || 3000;
 
+    this.initializeSentry();
     this.initializeTrustProxy();
     this.initializeMiddlewares();
     this.initializeRoutes(routes, apiPrefix);
     this.initializeSwagger(apiPrefix);
+    this.initializeSentryErrorHandler();
     this.initializeErrorHandling();
   }
 
@@ -46,6 +50,33 @@ class App {
 
   public getServer() {
     return this.app;
+  }
+
+  private initializeSentry() {
+    if (SENTRY_DSN) {
+      Sentry.init({
+        dsn: SENTRY_DSN,
+        integrations: [
+          new Sentry.Integrations.Http({ tracing: true }),
+          new Sentry.Integrations.Express({ app: this.app }),
+          nodeProfilingIntegration(),
+        ],
+        tracesSampleRate: 1.0,
+        profilesSampleRate: 1.0,
+      });
+      // RequestHandler creates a separate execution context, so that all
+      // transactions/spans/breadcrumbs are isolated across requests
+      this.app.use(Sentry.Handlers.requestHandler());
+      // TracingHandler creates a trace for every incoming request
+      this.app.use(Sentry.Handlers.tracingHandler());
+      logger.info('Sentry initialized');
+    }
+  }
+
+  private initializeSentryErrorHandler() {
+    if (SENTRY_DSN) {
+      this.app.use(Sentry.Handlers.errorHandler());
+    }
   }
 
   private initializeTrustProxy() {
@@ -129,6 +160,10 @@ class App {
   }
 
   private initializeRoutes(routes: Routes[], apiPrefix: string) {
+    this.app.get('/health', (req, res) => {
+      res.status(200).send('OK');
+    });
+
     routes.forEach((route) => {
       this.app.use(apiPrefix, route.router);
     });
