@@ -10,6 +10,14 @@ import { z } from 'zod';
  */
 config(); // .env
 const nodeEnv = process.env.NODE_ENV || 'development';
+
+// Load .env.{environment} (e.g. .env.staging, .env.production)
+const envPath = resolve(process.cwd(), `.env.${nodeEnv}`);
+if (existsSync(envPath)) {
+  config({ path: envPath });
+}
+
+// Load .env.{environment}.local (overrides everything, usually gitignored)
 const layerPath = resolve(process.cwd(), `.env.${nodeEnv}.local`);
 if (existsSync(layerPath)) {
   config({ path: layerPath });
