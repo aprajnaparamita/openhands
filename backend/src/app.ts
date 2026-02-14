@@ -5,6 +5,8 @@ import express from 'express';
 import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
 import hpp from 'hpp';
+import mongoSanitize from 'express-mongo-sanitize';
+import xss from 'xss-clean';
 import morgan from 'morgan';
 import swaggerJSDoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
@@ -52,6 +54,23 @@ class App {
   }
 
   private initializeMiddlewares() {
+    // Stricter rate limit for Auth
+    this.app.use('/api/v1/auth', rateLimit({
+      windowMs: 15 * 60 * 1000, // 15 minutes
+      limit: 20, // Limit each IP to 20 requests per windowMs
+      standardHeaders: true,
+      legacyHeaders: false,
+      message: 'Too many login attempts, please try again after 15 minutes',
+    }));
+
+    // Stricter rate limit for Chat
+    this.app.use('/api/v1/chat', rateLimit({
+      windowMs: 60 * 1000, // 1 minute
+      limit: 60, // Limit each IP to 60 requests per windowMs
+      standardHeaders: true,
+      legacyHeaders: false,
+    }));
+
     this.app.use(
       rateLimit({
         windowMs: 60_000,
@@ -83,7 +102,6 @@ class App {
       }),
     );
 
-    this.app.use(hpp());
     this.app.use(
       helmet({
         contentSecurityPolicy:
@@ -100,10 +118,14 @@ class App {
         referrerPolicy: { policy: 'no-referrer' },
       }),
     );
+
+    this.app.use(hpp());
+    this.app.use(cookieParser());
     this.app.use(compression());
     this.app.use(express.json({ limit: '10mb' }));
     this.app.use(express.urlencoded({ extended: true, limit: '10mb' }));
-    this.app.use(cookieParser());
+    this.app.use(mongoSanitize());
+    this.app.use(xss());
   }
 
   private initializeRoutes(routes: Routes[], apiPrefix: string) {

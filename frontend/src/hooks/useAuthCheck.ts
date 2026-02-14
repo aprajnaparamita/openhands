@@ -1,13 +1,34 @@
 // src/hooks/useAuthCheck.ts
-import { useEffect } from 'react';
+import { useEffect, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAccount } from '@particle-network/connectkit';
+import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 import { api } from '../api/client';
 
 export function useAuthCheck() {
   const navigate = useNavigate();
   const location = useLocation();
   const { isConnected, address } = useAccount();
+  const { executeRecaptcha } = useGoogleReCaptcha();
+
+  const handleLogin = useCallback(async (walletAddress: string) => {
+    try {
+      let captchaToken = '';
+      if (executeRecaptcha) {
+        captchaToken = await executeRecaptcha('login');
+      }
+      
+      console.log(`[useAuthCheck] Logging in with wallet ${walletAddress}...`);
+      const loginResponse = await api.post('/auth/wallet', { 
+        walletAddress,
+        captchaToken
+      });
+      return loginResponse.data.data;
+    } catch (error) {
+      console.error('[useAuthCheck] Login failed:', error);
+      throw error;
+    }
+  }, [executeRecaptcha]);
 
   useEffect(() => {
     const checkUserProfile = async () => {
@@ -30,13 +51,10 @@ export function useAuthCheck() {
 
         // Step 2: If no session but wallet connected, try to login
         if (!userData && isConnected && address) {
-          console.log(`[useAuthCheck] Logging in with wallet ${address}...`);
           try {
-            const loginResponse = await api.post('/auth/wallet', { walletAddress: address });
-            userData = loginResponse.data.data;
+            userData = await handleLogin(address);
             console.log('[useAuthCheck] Login successful:', userData);
           } catch (error) {
-            console.error('[useAuthCheck] Login failed:', error);
             return; // Stop if login fails
           }
         }
@@ -75,7 +93,7 @@ export function useAuthCheck() {
     };
 
     checkUserProfile();
-  }, [isConnected, address, navigate, location.pathname]);
+  }, [isConnected, address, navigate, location.pathname, handleLogin]);
 
   return { isConnected, address };
 }

@@ -8,10 +8,14 @@ import { DataStoredInToken, TokenData } from '@interfaces/auth.interface';
 import { User } from '@entities/user.entity';
 import { UsersRepository } from '@repositories/users.repository';
 import type { IUsersRepository } from '@repositories/users.repository';
+import { CaptchaService } from './captcha.service';
 
 @injectable()
 export class AuthService {
-  constructor(@inject(UsersRepository) private usersRepository: IUsersRepository) {}
+  constructor(
+    @inject(UsersRepository) private usersRepository: IUsersRepository,
+    @inject(CaptchaService) private captchaService: CaptchaService
+  ) {}
 
   private createAccessToken(user: User): TokenData {
     if (!SECRET_KEY) throw new Error('SECRET_KEY is not defined');
@@ -39,11 +43,22 @@ export class AuthService {
     }; Path=/; SameSite=Lax;${NODE_ENV === 'production' ? ' Secure;' : ''}`;
   }
 
-  public async loginWithWallet(walletAddress: string): Promise<{
+  public async loginWithWallet(walletAddress: string, captchaToken?: string): Promise<{
     accessTokenCookie: string;
     refreshTokenCookie: string;
     user: User;
   }> {
+    // Verify CAPTCHA
+    if (NODE_ENV === 'production') {
+      if (!captchaToken) {
+        throw new HttpException(400, 'Captcha token is required');
+      }
+      const isCaptchaValid = await this.captchaService.verifyToken(captchaToken);
+      if (!isCaptchaValid) {
+        throw new HttpException(400, 'Invalid CAPTCHA');
+      }
+    }
+
     let user = await this.usersRepository.findByWalletAddress(walletAddress);
 
     if (!user) {

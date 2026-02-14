@@ -9,8 +9,8 @@ export class AuthController {
   constructor(@inject(AuthService) private readonly authService: AuthService) {}
 
   public logInWithWallet: RequestHandler = asyncHandler(async (req: Request, res: Response): Promise<void> => {
-    const { walletAddress } = req.body;
-    const { accessTokenCookie, refreshTokenCookie, user } = await this.authService.loginWithWallet(walletAddress);
+    const { walletAddress, captchaToken } = req.body;
+    const { accessTokenCookie, refreshTokenCookie, user } = await this.authService.loginWithWallet(walletAddress, captchaToken);
 
     res.setHeader('Set-Cookie', [accessTokenCookie, refreshTokenCookie]);
     res.status(200).json({ data: user.toResponse(), message: 'loginWithWallet' });

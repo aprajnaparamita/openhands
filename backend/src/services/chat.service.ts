@@ -1,4 +1,4 @@
-import { injectable } from 'tsyringe';
+import { injectable, inject } from 'tsyringe';
 import PubNub from 'pubnub';
 import { 
   PUBNUB_PUBLISH_KEY, 
@@ -6,6 +6,7 @@ import {
   PUBNUB_SECRET_KEY 
 } from '@config/env';
 import { HttpException } from '@exceptions/httpException';
+import { ContentSecurityService } from './content-security.service';
 
 @injectable()
 export class ChatService {
@@ -14,7 +15,7 @@ export class ChatService {
   private readonly MAX_MESSAGES_PER_MINUTE = 10;
   private userMessageTimestamps: Map<string, number[]> = new Map();
 
-  constructor() {
+  constructor(@inject(ContentSecurityService) private contentSecurity: ContentSecurityService) {
     this.pubnub = new PubNub({
       publishKey: PUBNUB_PUBLISH_KEY,
       subscribeKey: PUBNUB_SUBSCRIBE_KEY,
@@ -53,10 +54,11 @@ export class ChatService {
 
     // 2. Content Moderation (PII & NudeNet Placeholder)
     if (content.text) {
-      this.checkPII(content.text);
+      this.contentSecurity.checkPII(content.text);
+      this.contentSecurity.checkProfanity(content.text);
     }
     if (content.imageUrl) {
-      await this.checkImageSafety(content.imageUrl);
+      await this.contentSecurity.checkImageSafety(content.imageUrl);
     }
 
     // 3. Publish to PubNub
@@ -88,25 +90,6 @@ export class ChatService {
 
     recentTimestamps.push(now);
     this.userMessageTimestamps.set(userId, recentTimestamps);
-  }
-
-  private checkPII(text: string): void {
-    const emailRegex = /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/;
-    const phoneRegex = /\b\d{3}[-.]?\d{3}[-.]?\d{4}\b/;
-
-    if (emailRegex.test(text) || phoneRegex.test(text)) {
-      throw new HttpException(400, 'Message contains PII (Email or Phone). Please remove it.');
-    }
-  }
-
-  private async checkImageSafety(imageUrl: string): Promise<void> {
-    // TODO: Integrate real NudeNet service or similar API
-    // For now, we mock it. If URL contains "unsafe", we block it.
-    if (imageUrl.includes('unsafe')) {
-        // Admin notify logic would go here
-        console.warn(`[Admin Notify] Unsafe image blocked: ${imageUrl}`);
-        throw new HttpException(400, 'Image detected as unsafe content.');
-    }
   }
 }
 

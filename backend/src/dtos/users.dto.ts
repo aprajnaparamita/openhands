@@ -61,6 +61,7 @@ export type UpdateUserDto = z.infer<typeof updateUserSchema>;
 // Login with Wallet DTO
 export const loginWalletSchema = z.object({
   walletAddress: walletAddressSchema,
+  captchaToken: z.string().optional(),
 });
 
 export type LoginWalletDto = z.infer<typeof loginWalletSchema>;

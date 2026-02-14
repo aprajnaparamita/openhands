@@ -4,6 +4,7 @@ import { ParticleConnectkit } from './connectkit';
 import { BrowserRouter } from 'react-router-dom';
 import PubNub from 'pubnub';
 import { PubNubProvider } from 'pubnub-react';
+import { GoogleReCaptchaProvider } from 'react-google-recaptcha-v3';
 import App, { LoadingSpinner } from './App';
 import './index.css';
 
@@ -21,9 +22,19 @@ root.render(
     <Suspense fallback={<LoadingSpinner />}>
       <PubNubProvider client={pubnub}>
         <BrowserRouter>
-          <ParticleConnectkit>
-            <App />
-          </ParticleConnectkit>
+          <GoogleReCaptchaProvider
+            reCaptchaKey={process.env.REACT_APP_RECAPTCHA_SITE_KEY || '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI'} // Use a dummy key for dev/demo if env is missing
+            scriptProps={{
+              async: false,
+              defer: false,
+              appendTo: 'head',
+              nonce: undefined,
+            }}
+          >
+            <ParticleConnectkit>
+              <App />
+            </ParticleConnectkit>
+          </GoogleReCaptchaProvider>
         </BrowserRouter>
       </PubNubProvider>
     </Suspense>
