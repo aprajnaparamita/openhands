@@ -15,8 +15,8 @@ import { BrowseProjects } from './components/BrowseProjects';
 import { MyAccount } from './components/MyAccount';
 import { AdminDashboard } from './components/Admin/AdminDashboard';
 import Header from './components/header';
+import Footer from './components/Footer';
 import OpenHands from './components/openhands';
-import styles from './App.module.css';
 
 export function LoadingSpinner() {
   return (
@@ -31,17 +31,24 @@ function App() {
   const { chain } = useAccount();
 
   return (
-    <div className={styles.app}>
+    <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
       <Header />
-      <main className={styles['main-content']}>
+      <main className="flex-grow w-full pt-8 pb-16">
         <Routes>
           <Route
             path="/"
             element={
               isConnected && chain ? (
-                <OpenHands />
+                <div className="max-w-2xl mx-auto mt-8">
+                  <OpenHands />
+                </div>
               ) : (
-                <div>Connect your wallet to continue</div>
+                <div className="flex items-center justify-center min-h-[60vh]">
+                  <div className="text-center space-y-4">
+                    <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">Welcome to OpenHands</h1>
+                    <p className="text-xl text-gray-600 dark:text-gray-300">Connect your wallet to get started</p>
+                  </div>
+                </div>
               )
             }
           />
@@ -144,6 +151,7 @@ function App() {
           )}
         </Routes>
       </main>
+      <Footer />
     </div>
   );
 }

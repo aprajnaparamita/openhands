@@ -8,27 +8,27 @@ import { Commission } from '../../types/commission';
 const CommissionCard: React.FC<{ commission: Commission }> = ({ commission }) => (
   <Link
     to={`/commissions/${commission.id}`}
-    className="block bg-white rounded-xl shadow-sm hover:shadow-md transition border border-gray-100 overflow-hidden mb-4"
+    className="block bg-white dark:bg-gray-800 rounded-xl shadow-sm hover:shadow-md transition border border-gray-100 dark:border-gray-700 overflow-hidden mb-4 group"
   >
     <div className="p-6">
       <div className="flex justify-between items-start mb-4">
         <span className={`px-3 py-1 rounded-full text-xs font-semibold capitalize
-          ${commission.status === 'completed' ? 'bg-green-100 text-green-800' : 
-            commission.status === 'in_progress' ? 'bg-blue-100 text-blue-800' :
-            commission.status === 'delivered' ? 'bg-purple-100 text-purple-800' :
-            commission.status === 'reviewed' ? 'bg-pink-100 text-pink-800' :
-            commission.status === 'accepted' ? 'bg-indigo-100 text-indigo-800' :
-            commission.status === 'funded' ? 'bg-teal-100 text-teal-800' :
-            'bg-gray-100 text-gray-800'}`}>
+          ${commission.status === 'completed' ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300' : 
+            commission.status === 'in_progress' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300' :
+            commission.status === 'delivered' ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-300' :
+            commission.status === 'reviewed' ? 'bg-pink-100 dark:bg-pink-900/30 text-pink-800 dark:text-pink-300' :
+            commission.status === 'accepted' ? 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-800 dark:text-indigo-300' :
+            commission.status === 'funded' ? 'bg-teal-100 dark:bg-teal-900/30 text-teal-800 dark:text-teal-300' :
+            'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300'}`}>
           {commission.status.replace('_', ' ')}
         </span>
-        <span className="text-gray-500 text-sm">{new Date(commission.createdAt).toLocaleDateString()}</span>
+        <span className="text-gray-500 dark:text-gray-400 text-sm">{new Date(commission.createdAt).toLocaleDateString()}</span>
       </div>
-      <h3 className="text-xl font-bold text-gray-900 mb-2 truncate">{commission.title}</h3>
-      <p className="text-gray-600 text-sm line-clamp-2 mb-4">{commission.description}</p>
-      <div className="flex justify-between items-center pt-4 border-t border-gray-50">
-        <span className="font-bold text-gray-900">{commission.price} SOL</span>
-        <span className="text-sm text-gray-500">
+      <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2 truncate group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{commission.title}</h3>
+      <p className="text-gray-600 dark:text-gray-300 text-sm line-clamp-2 mb-4">{commission.description}</p>
+      <div className="flex justify-between items-center pt-4 border-t border-gray-50 dark:border-gray-700">
+        <span className="font-bold text-gray-900 dark:text-white">{commission.price} SOL</span>
+        <span className="text-sm text-gray-500 dark:text-gray-400">
           {commission.providerId ? 'Provider Assigned' : 'Looking for Provider'}
         </span>
       </div>
@@ -38,9 +38,9 @@ const CommissionCard: React.FC<{ commission: Commission }> = ({ commission }) =>
 
 const Section: React.FC<{ title: string; commissions: Commission[]; emptyMessage: string }> = ({ title, commissions, emptyMessage }) => (
   <div className="mb-12">
-    <h2 className="text-2xl font-bold text-gray-800 mb-6 border-b pb-2">{title}</h2>
+    <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-6 border-b dark:border-gray-700 pb-2">{title}</h2>
     {commissions.length === 0 ? (
-      <div className="text-gray-500 italic p-4 bg-gray-50 rounded-lg">{emptyMessage}</div>
+      <div className="text-gray-500 dark:text-gray-400 italic p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-dashed border-gray-200 dark:border-gray-700">{emptyMessage}</div>
     ) : (
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {commissions.map(comm => (

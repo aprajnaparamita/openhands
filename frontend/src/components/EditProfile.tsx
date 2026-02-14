@@ -76,269 +76,276 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ label, value, onChange, multi
             <div key={idx} className="relative w-24 h-24">
               <img src={url} alt="Uploaded" className="w-full h-full object-cover rounded-lg" />
               <button
-                type="button"
-                onClick={() => removeImage(idx)}
-                className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs"
-              >
-                ×
-              </button>
-            </div>
-          ))
-        ) : (
-          value && typeof value === 'string' && (
-            <div className="relative w-full h-48 md:w-64 md:h-64">
-              <img src={value} alt="Uploaded" className="w-full h-full object-cover rounded-lg" />
-              <button
-                type="button"
-                onClick={() => removeImage(0)}
-                className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center"
-              >
-                ×
-              </button>
-            </div>
-          )
-        )}
-      </div>
-
-      <input
-        type="file"
-        accept="image/*"
-        multiple={multiple}
-        onChange={handleFileChange}
-        disabled={uploading}
-        className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-      />
-      {uploading && <p className="text-sm text-gray-500 mt-1">Uploading...</p>}
+        type="button"
+        onClick={() => removeImage(idx)}
+        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600 transition-colors"
+      >
+        ×
+      </button>
     </div>
-  );
+  ))
+) : (
+  value && typeof value === 'string' && (
+    <div className="relative w-full h-48 md:w-64 md:h-64">
+      <img src={value} alt="Uploaded" className="w-full h-full object-cover rounded-lg border border-gray-200 dark:border-gray-700" />
+      <button
+        type="button"
+        onClick={() => removeImage(0)}
+        className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600 transition-colors"
+      >
+        ×
+      </button>
+    </div>
+  )
+)}
+</div>
+
+<input
+  type="file"
+  accept="image/*"
+  multiple={multiple}
+  onChange={handleFileChange}
+  disabled={uploading}
+  className="block w-full text-sm text-gray-500 dark:text-gray-400
+    file:mr-4 file:py-2 file:px-4
+    file:rounded-full file:border-0
+    file:text-sm file:font-semibold
+    file:bg-blue-50 file:text-blue-700
+    dark:file:bg-blue-900/30 dark:file:text-blue-300
+    hover:file:bg-blue-100 dark:hover:file:bg-blue-900/50
+    transition-colors cursor-pointer"
+/>
+{uploading && <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Uploading...</p>}
+</div>
+);
 };
 
 export const EditProfile: React.FC = () => {
-  const { address } = useAccount();
-  const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  
-  const [skillsInput, setSkillsInput] = useState('');
-  
-  const [formData, setFormData] = useState({
-    name: '',
-    bio: '',
-    role: '',
-    profileImage: '',
-    headerImage: '',
-    portfolio: [] as string[],
-    skills: [] as string[],
-    socialLinks: {
-      website: '',
-      twitter: '',
-      instagram: '',
-      github: '',
-    },
-    workDescription: '',
-    isAvailable: true,
-  });
+const { address } = useAccount();
+const navigate = useNavigate();
+const [loading, setLoading] = useState(true);
+const [saving, setSaving] = useState(false);
 
-  useEffect(() => {
-    if (!address) return;
-    const fetchProfile = async () => {
-      try {
-        const profile = await userApi.getProfile(address);
-        // Ensure we are accessing the data correctly
-        const data = profile.data || profile; 
-        
-        setFormData({
-          name: data.name || '',
-          bio: data.bio || '',
-          role: data.role || '',
-          profileImage: data.profileImage || '',
-          headerImage: data.headerImage || '',
-          portfolio: data.portfolio || [],
-          skills: data.skills || [],
-          socialLinks: {
-            website: data.socialLinks?.website || '',
-            twitter: data.socialLinks?.twitter || '',
-            instagram: data.socialLinks?.instagram || '',
-            github: data.socialLinks?.github || '',
-          },
-          workDescription: data.workDescription || '',
-          isAvailable: data.isAvailable !== undefined ? data.isAvailable : true,
-        });
-        setSkillsInput(data.skills ? data.skills.join(', ') : '');
-      } catch (error) {
-        console.error('Failed to load profile', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchProfile();
-  }, [address]);
+const [skillsInput, setSkillsInput] = useState('');
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!address) return;
+const [formData, setFormData] = useState({
+name: '',
+bio: '',
+role: '',
+profileImage: '',
+headerImage: '',
+portfolio: [] as string[],
+skills: [] as string[],
+socialLinks: {
+website: '',
+twitter: '',
+instagram: '',
+github: '',
+},
+workDescription: '',
+isAvailable: true,
+});
 
-    setSaving(true);
-    try {
-      await userApi.updateProfile(address, formData);
-      navigate('/dashboard');
-    } catch (error) {
-      console.error('Failed to update profile', error);
-      alert('Failed to update profile');
-    } finally {
-      setSaving(false);
-    }
-  };
+useEffect(() => {
+if (!address) return;
+const fetchProfile = async () => {
+try {
+const profile = await userApi.getProfile(address);
+// Ensure we are accessing the data correctly
+const data = profile.data || profile; 
 
-  if (loading) return <div className="p-8 text-center">Loading profile...</div>;
+setFormData({
+  name: data.name || '',
+  bio: data.bio || '',
+  role: data.role || '',
+  profileImage: data.profileImage || '',
+  headerImage: data.headerImage || '',
+  portfolio: data.portfolio || [],
+  skills: data.skills || [],
+  socialLinks: {
+    website: data.socialLinks?.website || '',
+    twitter: data.socialLinks?.twitter || '',
+    instagram: data.socialLinks?.instagram || '',
+    github: data.socialLinks?.github || '',
+  },
+  workDescription: data.workDescription || '',
+  isAvailable: data.isAvailable !== undefined ? data.isAvailable : true,
+});
+setSkillsInput(data.skills ? data.skills.join(', ') : '');
+} catch (error) {
+console.error('Failed to load profile', error);
+} finally {
+setLoading(false);
+}
+};
+fetchProfile();
+}, [address]);
 
-  return (
-    <div className="max-w-3xl mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-8">Edit Profile</h1>
-      
-      <form onSubmit={handleSubmit} className="space-y-6 bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-        <div className="flex items-center justify-between">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
-            <input
-              type="text"
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              required
-            />
-          </div>
-          
-          <div className="flex items-center ml-4">
-             <input
-                type="checkbox"
-                id="isAvailable"
-                checked={formData.isAvailable}
-                onChange={(e) => setFormData({ ...formData, isAvailable: e.target.checked })}
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-             />
-             <label htmlFor="isAvailable" className="ml-2 block text-sm text-gray-900">
-               Available for work
-             </label>
-          </div>
-        </div>
+const handleSubmit = async (e: React.FormEvent) => {
+e.preventDefault();
+if (!address) return;
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Bio</label>
-          <textarea
-            value={formData.bio}
-            onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
-            rows={3}
-            className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          />
-        </div>
+setSaving(true);
+try {
+await userApi.updateProfile(address, formData);
+navigate('/dashboard');
+} catch (error) {
+console.error('Failed to update profile', error);
+alert('Failed to update profile');
+} finally {
+setSaving(false);
+}
+};
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Work Description / Terms</label>
-          <textarea
-            value={formData.workDescription}
-            onChange={(e) => setFormData({ ...formData, workDescription: e.target.value })}
-            rows={4}
-            placeholder="Describe your services, pricing, and terms..."
-            className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          />
-        </div>
+if (loading) return <div className="p-8 text-center text-gray-900 dark:text-white">Loading profile...</div>;
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Skills (comma separated)</label>
-          <input
-            type="text"
-            value={skillsInput}
-            onChange={(e) => {
-              setSkillsInput(e.target.value);
-              setFormData({ ...formData, skills: e.target.value.split(',').map(s => s.trim()).filter(Boolean) });
-            }}
-            placeholder="Illustration, 3D Modeling, React, Smart Contracts..."
-            className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          />
-        </div>
+return (
+<div className="max-w-3xl mx-auto p-6 min-h-screen">
+<h1 className="text-3xl font-bold mb-8 text-gray-900 dark:text-white">Edit Profile</h1>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Website</label>
-              <input
-                type="url"
-                value={formData.socialLinks.website}
-                onChange={(e) => setFormData({ ...formData, socialLinks: { ...formData.socialLinks, website: e.target.value } })}
-                placeholder="https://yourportfolio.com"
-                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Twitter (X)</label>
-              <input
-                type="text"
-                value={formData.socialLinks.twitter}
-                onChange={(e) => setFormData({ ...formData, socialLinks: { ...formData.socialLinks, twitter: e.target.value } })}
-                placeholder="@username"
-                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Instagram</label>
-              <input
-                type="text"
-                value={formData.socialLinks.instagram}
-                onChange={(e) => setFormData({ ...formData, socialLinks: { ...formData.socialLinks, instagram: e.target.value } })}
-                placeholder="@username"
-                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">GitHub</label>
-              <input
-                type="text"
-                value={formData.socialLinks.github}
-                onChange={(e) => setFormData({ ...formData, socialLinks: { ...formData.socialLinks, github: e.target.value } })}
-                placeholder="username"
-                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-        </div>
+<form onSubmit={handleSubmit} className="space-y-6 bg-white dark:bg-dark-surface p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 transition-colors duration-200">
+<div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+<div className="flex-grow">
+<label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Name</label>
+<input
+  type="text"
+  value={formData.name}
+  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+  className="w-full p-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+  required
+/>
+</div>
 
-        <ImageUpload
-          label="Profile Photo"
-          value={formData.profileImage}
-          onChange={(url) => setFormData({ ...formData, profileImage: url as string })}
-        />
+<div className="flex items-center pt-6">
+ <input
+    type="checkbox"
+    id="isAvailable"
+    checked={formData.isAvailable}
+    onChange={(e) => setFormData({ ...formData, isAvailable: e.target.checked })}
+    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700"
+ />
+ <label htmlFor="isAvailable" className="ml-2 block text-sm text-gray-900 dark:text-white">
+   Available for work
+ </label>
+</div>
+</div>
 
-        <ImageUpload
-          label="Header Image"
-          value={formData.headerImage}
-          onChange={(url) => setFormData({ ...formData, headerImage: url as string })}
-        />
+<div>
+<label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Bio</label>
+<textarea
+value={formData.bio}
+onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
+rows={3}
+className="w-full p-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+/>
+</div>
 
-        {formData.role === 'artist' && (
-          <ImageUpload
-            label="Portfolio / Artwork"
-            value={formData.portfolio}
-            onChange={(urls) => setFormData({ ...formData, portfolio: urls as string[] })}
-            multiple
-          />
-        )}
+<div>
+<label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Work Description / Terms</label>
+<textarea
+value={formData.workDescription}
+onChange={(e) => setFormData({ ...formData, workDescription: e.target.value })}
+rows={4}
+placeholder="Describe your services, pricing, and terms..."
+className="w-full p-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors placeholder-gray-400 dark:placeholder-gray-500"
+/>
+</div>
 
-        <div className="flex justify-end pt-4">
-          <button
-            type="button"
-            onClick={() => navigate('/dashboard')}
-            className="mr-4 px-6 py-2 text-gray-600 hover:text-gray-800"
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            disabled={saving}
-            className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition font-semibold disabled:opacity-50"
-          >
-            {saving ? 'Saving...' : 'Save Changes'}
-          </button>
-        </div>
-      </form>
-    </div>
-  );
+<div>
+<label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Skills (comma separated)</label>
+<input
+type="text"
+value={skillsInput}
+onChange={(e) => {
+  setSkillsInput(e.target.value);
+  setFormData({ ...formData, skills: e.target.value.split(',').map(s => s.trim()).filter(Boolean) });
+}}
+placeholder="Illustration, 3D Modeling, React, Smart Contracts..."
+className="w-full p-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors placeholder-gray-400 dark:placeholder-gray-500"
+/>
+</div>
+
+<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div>
+  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Website</label>
+  <input
+    type="url"
+    value={formData.socialLinks.website}
+    onChange={(e) => setFormData({ ...formData, socialLinks: { ...formData.socialLinks, website: e.target.value } })}
+    placeholder="https://yourportfolio.com"
+    className="w-full p-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors placeholder-gray-400 dark:placeholder-gray-500"
+  />
+</div>
+<div>
+  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Twitter (X)</label>
+  <input
+    type="text"
+    value={formData.socialLinks.twitter}
+    onChange={(e) => setFormData({ ...formData, socialLinks: { ...formData.socialLinks, twitter: e.target.value } })}
+    placeholder="@username"
+    className="w-full p-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors placeholder-gray-400 dark:placeholder-gray-500"
+  />
+</div>
+<div>
+  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Instagram</label>
+  <input
+    type="text"
+    value={formData.socialLinks.instagram}
+    onChange={(e) => setFormData({ ...formData, socialLinks: { ...formData.socialLinks, instagram: e.target.value } })}
+    placeholder="@username"
+    className="w-full p-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors placeholder-gray-400 dark:placeholder-gray-500"
+  />
+</div>
+<div>
+  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">GitHub</label>
+  <input
+    type="text"
+    value={formData.socialLinks.github}
+    onChange={(e) => setFormData({ ...formData, socialLinks: { ...formData.socialLinks, github: e.target.value } })}
+    placeholder="username"
+    className="w-full p-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors placeholder-gray-400 dark:placeholder-gray-500"
+  />
+</div>
+</div>
+
+<ImageUpload
+label="Profile Photo"
+value={formData.profileImage}
+onChange={(url) => setFormData({ ...formData, profileImage: url as string })}
+/>
+
+<ImageUpload
+label="Header Image"
+value={formData.headerImage}
+onChange={(url) => setFormData({ ...formData, headerImage: url as string })}
+/>
+
+{formData.role === 'artist' && (
+<ImageUpload
+label="Portfolio / Artwork"
+value={formData.portfolio}
+onChange={(urls) => setFormData({ ...formData, portfolio: urls as string[] })}
+multiple
+/>
+)}
+
+<div className="flex justify-end pt-4">
+<button
+type="button"
+onClick={() => navigate('/dashboard')}
+className="mr-4 px-6 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-white transition-colors"
+>
+Cancel
+</button>
+<button
+type="submit"
+disabled={saving}
+className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+>
+{saving ? 'Saving...' : 'Save Changes'}
+</button>
+</div>
+</form>
+</div>
+);
 };

@@ -19,6 +19,8 @@ export interface Commission {
   deadline: string;
   status: CommissionStatus;
   referenceImages?: string[];
+  requirements?: string[];
+  tags?: string[];
   finalArtwork?: {
     url: string;
     hash: string;
@@ -34,4 +36,6 @@ export interface CreateCommissionData {
   price: number;
   deadline: string;
   referenceImages?: string[];
+  requirements?: string[];
+  tags?: string[];
 }

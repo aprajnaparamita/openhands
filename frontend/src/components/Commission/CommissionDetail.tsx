@@ -156,8 +156,8 @@ export const CommissionDetail: React.FC = () => {
     }
   };
 
-  if (loading) return <div className="p-8 text-center">Loading...</div>;
-  if (!commission || !currentUser) return <div className="p-8 text-center">Project not found</div>;
+  if (loading) return <div className="p-8 text-center text-gray-600 dark:text-gray-400">Loading...</div>;
+  if (!commission || !currentUser) return <div className="p-8 text-center text-gray-600 dark:text-gray-400">Project not found</div>;
 
   const isRequester = currentUser.id === commission.requesterId;
   const isProvider = currentUser.id === commission.providerId;
@@ -166,36 +166,57 @@ export const CommissionDetail: React.FC = () => {
     <div className="max-w-6xl mx-auto p-6 grid grid-cols-1 lg:grid-cols-3 gap-8">
       {/* Left Column: Details & Actions */}
       <div className="lg:col-span-2 space-y-6">
-        <div className="bg-white rounded-xl shadow-md p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 transition-colors">
           <div className="flex justify-between items-start mb-4">
-            <h1 className="text-3xl font-bold text-gray-900">{commission.title}</h1>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">{commission.title}</h1>
             <span className={`px-4 py-1 rounded-full text-sm font-semibold capitalize
-              ${commission.status === 'completed' ? 'bg-green-100 text-green-800' : 
-                commission.status === 'in_progress' ? 'bg-blue-100 text-blue-800' :
-                'bg-yellow-100 text-yellow-800'}`}>
+              ${commission.status === 'completed' ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200' : 
+                commission.status === 'in_progress' ? 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200' :
+                'bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200'}`}>
               {commission.status.replace('_', ' ')}
             </span>
           </div>
           
-          <p className="text-gray-600 mb-6 whitespace-pre-wrap">{commission.description}</p>
+          <p className="text-gray-600 dark:text-gray-300 mb-6 whitespace-pre-wrap">{commission.description}</p>
           
-          <div className="flex gap-6 text-sm text-gray-500 border-t pt-4">
+          {commission.tags && commission.tags.length > 0 && (
+            <div className="mb-6 flex flex-wrap gap-2" aria-label="Project Tags">
+              {commission.tags.map(tag => (
+                <span key={tag} className="px-3 py-1 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300 text-sm rounded-full font-medium">
+                  {tag}
+                </span>
+              ))}
+            </div>
+          )}
+
+          {commission.requirements && commission.requirements.length > 0 && (
+            <div className="mb-6 bg-gray-50 dark:bg-gray-700/50 p-4 rounded-lg">
+              <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wide">Project Requirements</h3>
+              <ul className="list-disc pl-5 space-y-1">
+                {commission.requirements.map((req, i) => (
+                  <li key={i} className="text-gray-600 dark:text-gray-300 text-sm">{req}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+          
+          <div className="flex gap-6 text-sm text-gray-500 dark:text-gray-400 border-t dark:border-gray-700 pt-4">
             <div>
-              <span className="font-semibold block text-gray-700">Budget</span>
+              <span className="font-semibold block text-gray-700 dark:text-gray-300">Budget</span>
               {commission.price} SOL
             </div>
             <div>
-              <span className="font-semibold block text-gray-700">Deadline</span>
+              <span className="font-semibold block text-gray-700 dark:text-gray-300">Deadline</span>
               {new Date(commission.deadline).toLocaleDateString()}
             </div>
           </div>
 
           {commission.referenceImages && commission.referenceImages.length > 0 && (
             <div className="mt-6">
-              <h3 className="text-sm font-semibold text-gray-700 mb-2">Reference Images</h3>
+              <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Reference Images</h3>
               <div className="flex gap-2 overflow-x-auto pb-2">
                 {commission.referenceImages.map((img, idx) => (
-                  <img key={idx} src={img} alt="Ref" className="h-24 w-24 object-cover rounded-lg border" />
+                  <img key={idx} src={img} alt={`Reference ${idx + 1}`} className="h-24 w-24 object-cover rounded-lg border dark:border-gray-600" />
                 ))}
               </div>
             </div>
@@ -203,8 +224,8 @@ export const CommissionDetail: React.FC = () => {
         </div>
 
         {/* Action Zone */}
-        <div className="bg-white rounded-xl shadow-md p-6">
-          <h3 className="text-lg font-bold mb-4">Project Status & Actions</h3>
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 transition-colors">
+          <h3 className="text-lg font-bold mb-4 text-gray-900 dark:text-white">Project Status & Actions</h3>
           
           {commission.status === CommissionStatus.CREATED && isRequester && (
             <button
@@ -226,14 +247,14 @@ export const CommissionDetail: React.FC = () => {
 
           {commission.status === CommissionStatus.IN_PROGRESS && isProvider && (
             <form onSubmit={handleDeliver} className="space-y-4">
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+              <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center hover:border-blue-500 dark:hover:border-blue-400 transition-colors">
                 <input
                   type="file"
                   onChange={(e) => setDeliveryFile(e.target.files?.[0] || null)}
                   className="hidden"
                   id="delivery-upload"
                 />
-                <label htmlFor="delivery-upload" className="cursor-pointer text-blue-600 font-medium">
+                <label htmlFor="delivery-upload" className="cursor-pointer text-blue-600 dark:text-blue-400 font-medium">
                   {deliveryFile ? deliveryFile.name : 'Upload Final Artwork'}
                 </label>
               </div>
@@ -249,34 +270,36 @@ export const CommissionDetail: React.FC = () => {
 
           {commission.status === CommissionStatus.DELIVERED && (
             <div className="space-y-4">
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <h4 className="font-semibold mb-2">Delivered Work</h4>
+              <div className="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-lg">
+                <h4 className="font-semibold mb-2 text-gray-900 dark:text-white">Delivered Work</h4>
                 {commission.finalArtwork?.url && (
-                  <img src={commission.finalArtwork.url} alt="Final" className="max-w-full rounded-lg shadow-sm" />
+                  <img src={commission.finalArtwork.url} alt="Final delivered artwork" className="max-w-full rounded-lg shadow-sm" />
                 )}
               </div>
               {isRequester && (
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Rating (1-5)</label>
+                    <label htmlFor="rating" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Rating (1-5)</label>
                     <select 
+                      id="rating"
                       value={reviewScore} 
                       onChange={(e) => setReviewScore(Number(e.target.value))}
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                      className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                     >
                       {[5,4,3,2,1].map(n => <option key={n} value={n}>{n} Stars</option>)}
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Review</label>
+                    <label htmlFor="review-text" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Review</label>
                     <textarea
+                      id="review-text"
                       value={reviewText}
                       onChange={(e) => setReviewText(e.target.value)}
                       maxLength={200}
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                      className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                       rows={3}
                     />
-                    <div className="text-right text-xs text-gray-500 mt-1">
+                    <div className="text-right text-xs text-gray-500 dark:text-gray-400 mt-1">
                       {reviewText.length}/200
                     </div>
                   </div>
@@ -305,16 +328,16 @@ export const CommissionDetail: React.FC = () => {
       {/* Right Column: Chat */}
       <div className="lg:col-span-1">
         {chatToken && commission.id ? (
-          <div className="bg-white rounded-xl shadow-md overflow-hidden h-[600px] flex flex-col">
-            <div className="p-4 border-b bg-gray-50">
-              <h3 className="font-semibold text-gray-700">Project Chat</h3>
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden h-[600px] flex flex-col transition-colors">
+            <div className="p-4 border-b dark:border-gray-700 bg-gray-50 dark:bg-gray-700">
+              <h3 className="font-semibold text-gray-700 dark:text-white">Project Chat</h3>
             </div>
-            <div className="flex-1">
+            <div className="flex-1 bg-white dark:bg-gray-800">
               <Chat channel={`commission.${commission.id}`} uuid={currentUser.id} token={chatToken} />
             </div>
           </div>
         ) : (
-          <div className="bg-gray-100 rounded-xl h-64 flex items-center justify-center text-gray-500">
+          <div className="bg-gray-100 dark:bg-gray-800 rounded-xl h-64 flex items-center justify-center text-gray-500 dark:text-gray-400 transition-colors">
             Chat available after acceptance
           </div>
         )}

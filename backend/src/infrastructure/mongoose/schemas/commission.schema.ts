@@ -49,6 +49,14 @@ const commissionSchema = new Schema(
       type: [String],
       default: [],
     },
+    requirements: {
+      type: [String],
+      default: [],
+    },
+    tags: {
+      type: [String],
+      default: [],
+    },
     finalArtwork: {
       type: String,
       default: null,

@@ -27,6 +27,8 @@ export interface CommissionPersistenceData {
   price: number;
   deadline?: Date;
   referenceImages?: string[];
+  requirements?: string[];
+  tags?: string[];
   finalArtwork?: string;
   finalArtworkHash?: string;
   escrowAddress?: string;
@@ -58,6 +60,8 @@ export class Commission {
     private _price: number,
     private _deadline?: Date,
     private _referenceImages: string[] = [],
+    private _requirements: string[] = [],
+    private _tags: string[] = [],
     private _finalArtwork?: string,
     private _finalArtworkHash?: string,
     private _escrowAddress?: string,
@@ -79,6 +83,8 @@ export class Commission {
     price: number;
     deadline?: Date;
     referenceImages?: string[];
+    requirements?: string[];
+    tags?: string[];
   }): Commission {
     const id = crypto.randomUUID();
     
@@ -95,7 +101,9 @@ export class Commission {
       CommissionStatus.CREATED,
       data.price,
       data.deadline,
-      data.referenceImages
+      data.referenceImages,
+      data.requirements,
+      data.tags
     );
   }
 
@@ -110,6 +118,8 @@ export class Commission {
       data.price,
       data.deadline,
       data.referenceImages,
+      data.requirements,
+      data.tags,
       data.finalArtwork,
       data.finalArtworkHash,
       data.escrowAddress,
@@ -134,6 +144,8 @@ export class Commission {
   get price(): number { return this._price; }
   get deadline(): Date | undefined { return this._deadline ? new Date(this._deadline) : undefined; }
   get referenceImages(): string[] { return [...this._referenceImages]; }
+  get requirements(): string[] { return [...this._requirements]; }
+  get tags(): string[] { return [...this._tags]; }
   get finalArtwork(): string | undefined { return this._finalArtwork; }
   get finalArtworkHash(): string | undefined { return this._finalArtworkHash; }
   get escrowAddress(): string | undefined { return this._escrowAddress; }
@@ -255,6 +267,8 @@ export class Commission {
       price: this._price,
       deadline: this._deadline,
       referenceImages: this._referenceImages,
+      requirements: this._requirements,
+      tags: this._tags,
       finalArtwork: this._finalArtwork,
       finalArtworkHash: this._finalArtworkHash,
       escrowAddress: this._escrowAddress,
@@ -349,6 +363,8 @@ export class Commission {
       price: this._price,
       deadline: this._deadline,
       referenceImages: this._referenceImages,
+      requirements: this._requirements,
+      tags: this._tags,
       finalArtwork: this._finalArtwork,
       finalArtworkHash: this._finalArtworkHash,
       escrowAddress: this._escrowAddress,

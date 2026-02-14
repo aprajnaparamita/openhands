@@ -132,6 +132,8 @@ export class MongooseCommissionsRepository implements ICommissionsRepository {
       price: mongooseDoc.price,
       deadline: mongooseDoc.deadline,
       referenceImages: mongooseDoc.referenceImages,
+      requirements: mongooseDoc.requirements,
+      tags: mongooseDoc.tags,
       finalArtwork: mongooseDoc.finalArtwork,
       finalArtworkHash: mongooseDoc.finalArtworkHash,
       escrowAddress: mongooseDoc.escrowAddress,

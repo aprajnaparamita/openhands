@@ -5,6 +5,7 @@ import { BrowserRouter } from 'react-router-dom';
 import PubNub from 'pubnub';
 import { PubNubProvider } from 'pubnub-react';
 import { GoogleReCaptchaProvider } from 'react-google-recaptcha-v3';
+import { ThemeProvider } from './context/ThemeContext';
 import App, { LoadingSpinner } from './App';
 import './index.css';
 
@@ -31,9 +32,11 @@ root.render(
               nonce: undefined,
             }}
           >
-            <ParticleConnectkit>
-              <App />
-            </ParticleConnectkit>
+            <ThemeProvider>
+              <ParticleConnectkit>
+                <App />
+              </ParticleConnectkit>
+            </ThemeProvider>
           </GoogleReCaptchaProvider>
         </BrowserRouter>
       </PubNubProvider>
