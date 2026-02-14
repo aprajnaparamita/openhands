@@ -10,6 +10,7 @@ export enum CommissionStatus {
   REVIEWED = 'reviewed',
   COMPLETED = 'completed',
   CANCELLED = 'cancelled',
+  DISPUTE = 'dispute',
 }
 
 export interface CommissionPersistenceData {
@@ -32,6 +33,7 @@ export interface CommissionPersistenceData {
   startedAt?: Date;
   completedAt?: Date;
   cancelledAt?: Date;
+  disputeAt?: Date;
   ratingId?: string | { score: number; review: string };
   txSignatures?: {
     fund?: string;
@@ -39,6 +41,7 @@ export interface CommissionPersistenceData {
     deliver?: string;
     review?: string;
     complete?: string;
+    resolve?: string;
   };
   createdAt: Date;
   updatedAt: Date;
@@ -61,8 +64,9 @@ export class Commission {
     private _startedAt?: Date,
     private _completedAt?: Date,
     private _cancelledAt?: Date,
+    private _disputeAt?: Date,
     private _ratingId?: string | { score: number; review: string },
-    private _txSignatures: { fund?: string; accept?: string; deliver?: string; review?: string; complete?: string } = {},
+    private _txSignatures: { fund?: string; accept?: string; deliver?: string; review?: string; complete?: string; resolve?: string } = {},
     private readonly _createdAt: Date = new Date(),
     private _updatedAt: Date = new Date()
   ) {}
@@ -112,6 +116,7 @@ export class Commission {
       data.startedAt,
       data.completedAt,
       data.cancelledAt,
+      data.disputeAt,
       data.ratingId,
       data.txSignatures || {},
       data.createdAt,
@@ -134,7 +139,7 @@ export class Commission {
   get escrowAddress(): string | undefined { return this._escrowAddress; }
   get startedAt(): Date | undefined { return this._startedAt ? new Date(this._startedAt) : undefined; }
   get completedAt(): Date | undefined { return this._completedAt ? new Date(this._completedAt) : undefined; }
-  get txSignatures(): { fund?: string; accept?: string; deliver?: string; review?: string; complete?: string } { return { ...this._txSignatures }; }
+  get txSignatures(): { fund?: string; accept?: string; deliver?: string; review?: string; complete?: string; resolve?: string } { return { ...this._txSignatures }; }
   
   // Domain Methods
   fund(txSignature?: string): void {
@@ -194,8 +199,8 @@ export class Commission {
        throw new Error('Commission must be reviewed before completion');
      }
      this._status = CommissionStatus.COMPLETED;
-     this._completedAt = new Date();
      if (txSignature) this._txSignatures.complete = txSignature;
+     this._completedAt = new Date();
      this._updatedAt = new Date();
   }
 
@@ -205,7 +210,32 @@ export class Commission {
     }
     this._status = CommissionStatus.CANCELLED;
     this._cancelledAt = new Date();
-    // Assuming cancel also has a tx on chain
+    this._updatedAt = new Date();
+  }
+
+  raiseDispute(): void {
+    if ([CommissionStatus.COMPLETED, CommissionStatus.CANCELLED].includes(this._status)) {
+      throw new Error('Cannot dispute a completed or cancelled commission');
+    }
+    this._status = CommissionStatus.DISPUTE;
+    this._disputeAt = new Date();
+    this._updatedAt = new Date();
+  }
+
+  resolveDispute(resolution: 'refund' | 'pay_provider', txSignature?: string): void {
+    if (this._status !== CommissionStatus.DISPUTE) {
+      throw new Error('Commission is not in dispute');
+    }
+    
+    if (resolution === 'refund') {
+      this._status = CommissionStatus.CANCELLED;
+      this._cancelledAt = new Date();
+    } else {
+      this._status = CommissionStatus.COMPLETED;
+      this._completedAt = new Date();
+    }
+
+    if (txSignature) this._txSignatures.resolve = txSignature;
     this._updatedAt = new Date();
   }
 
@@ -231,6 +261,7 @@ export class Commission {
       startedAt: this._startedAt,
       completedAt: this._completedAt,
       cancelledAt: this._cancelledAt,
+      disputeAt: this._disputeAt,
       ratingId: this._ratingId,
       txSignatures: this._txSignatures,
       createdAt: this._createdAt,
@@ -238,6 +269,7 @@ export class Commission {
     };
   }
   get cancelledAt(): Date | undefined { return this._cancelledAt ? new Date(this._cancelledAt) : undefined; }
+  get disputeAt(): Date | undefined { return this._disputeAt ? new Date(this._disputeAt) : undefined; }
   get ratingId(): string | { score: number; review: string } | undefined { return this._ratingId; }
   get createdAt(): Date { return new Date(this._createdAt); }
   get updatedAt(): Date { return new Date(this._updatedAt); }
@@ -323,6 +355,7 @@ export class Commission {
       startedAt: this._startedAt,
       completedAt: this._completedAt,
       cancelledAt: this._cancelledAt,
+      disputeAt: this._disputeAt,
       ratingId: this._ratingId,
       createdAt: this._createdAt,
       updatedAt: this._updatedAt,

@@ -1,6 +1,6 @@
 import { injectable, inject } from 'tsyringe';
 import { HttpException } from '../exceptions/httpException.js';
-import { User, type UserCreateData } from '../entities/user.entity.js';
+import { User, type UserCreateData, UserType } from '../entities/user.entity.js';
 import { UsersRepository } from '../repositories/users.repository.js';
 import type { IUsersRepository } from '../repositories/users.repository.js';
 
@@ -33,6 +33,10 @@ export class UsersService {
   }
 
   async createUser(userData: UserCreateData): Promise<User> {
+    if (userData.role === UserType.ADMIN) {
+      throw new HttpException(403, 'Cannot create admin user via public API');
+    }
+
     if (userData.walletAddress) {
       const exists = await this.usersRepository.findByWalletAddress(userData.walletAddress);
       if (exists) {
@@ -59,6 +63,10 @@ export class UsersService {
     headerImage?: string;
     portfolio?: string[];
   }): Promise<User> {
+    if (updateData.role === UserType.ADMIN) {
+      throw new HttpException(403, 'Cannot update user to admin role');
+    }
+
     console.log(`[UsersService] updateUser: Updating user ${id}`, updateData);
     let existingUser: User | undefined;
     

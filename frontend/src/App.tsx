@@ -13,6 +13,7 @@ import { ProfileView } from './components/ProfileView';
 import { BrowseArtists } from './components/BrowseArtists';
 import { BrowseProjects } from './components/BrowseProjects';
 import { MyAccount } from './components/MyAccount';
+import { AdminDashboard } from './components/Admin/AdminDashboard';
 import Header from './components/header';
 import OpenHands from './components/openhands';
 import styles from './App.module.css';
@@ -123,6 +124,16 @@ function App() {
             element={
               isConnected ? (
                 <CommissionDetail />
+              ) : (
+                <Navigate to="/" replace />
+              )
+            }
+          />
+          <Route
+            path="/admin"
+            element={
+              isConnected ? (
+                <AdminDashboard />
               ) : (
                 <Navigate to="/" replace />
               )

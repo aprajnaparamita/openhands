@@ -12,6 +12,8 @@ export interface ICommissionsRepository {
   findByUserId(userId: string): Promise<Commission[]>;
   findAllByUserId(userId: string): Promise<Commission[]>;
   findAvailable(): Promise<Commission[]>;
+  findDisputed(): Promise<Commission[]>;
+  getStats(): Promise<{ totalVolume: number; completedCount: number; disputeCount: number }>;
 }
 
 @singleton()
@@ -94,6 +96,29 @@ export class MongooseCommissionsRepository implements ICommissionsRepository {
       .lean();
     
     return commissions.map(commission => Commission.fromPersistence(this.mapToPersistence(commission)));
+  }
+
+  async findDisputed(): Promise<Commission[]> {
+    const commissions = await CommissionModel.find({
+      status: CommissionStatus.DISPUTE,
+    })
+      .sort({ createdAt: -1 })
+      .lean();
+    
+    return commissions.map(commission => Commission.fromPersistence(this.mapToPersistence(commission)));
+  }
+
+  async getStats(): Promise<{ totalVolume: number; completedCount: number; disputeCount: number }> {
+    const completed = await CommissionModel.find({ status: CommissionStatus.COMPLETED }).lean();
+    const disputes = await CommissionModel.find({ status: CommissionStatus.DISPUTE }).lean();
+    
+    const totalVolume = completed.reduce((sum, c) => sum + (c.price || 0), 0);
+    
+    return {
+      totalVolume,
+      completedCount: completed.length,
+      disputeCount: disputes.length
+    };
   }
 
   private mapToPersistence(mongooseDoc: any): CommissionPersistenceData {

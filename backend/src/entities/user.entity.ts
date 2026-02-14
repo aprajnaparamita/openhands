@@ -2,7 +2,8 @@ import crypto from 'crypto';
 
 export enum UserType {
   ARTIST = 'artist',
-  REQUESTER = 'requester'
+  REQUESTER = 'requester',
+  ADMIN = 'admin'
 }
 
 export interface UserPersistenceData {
@@ -23,6 +24,7 @@ export interface UserPersistenceData {
   };
   workDescription?: string;
   isAvailable?: boolean;
+  isBanned?: boolean;
   cachedAverageRating?: number;
   cachedTotalRatings?: number;
   cachedCompletionRate?: number;
@@ -64,6 +66,7 @@ export class User {
     private _socialLinks: { website?: string; twitter?: string; instagram?: string; github?: string } | undefined,
     private _workDescription: string | undefined,
     private _isAvailable: boolean | undefined,
+    private _isBanned: boolean | undefined,
     private _cachedAverageRating: number | undefined,
     private _cachedTotalRatings: number | undefined,
     private _cachedCompletionRate: number | undefined,
@@ -88,6 +91,7 @@ export class User {
       data.socialLinks,
       data.workDescription,
       data.isAvailable ?? true,
+      false, // isBanned default false
       undefined, // cachedAverageRating
       undefined, // cachedTotalRatings
       undefined, // cachedCompletionRate
@@ -109,6 +113,7 @@ export class User {
       data.socialLinks,
       data.workDescription,
       data.isAvailable,
+      data.isBanned,
       data.cachedAverageRating,
       data.cachedTotalRatings,
       data.cachedCompletionRate,
@@ -132,6 +137,7 @@ export class User {
       socialLinks: this._socialLinks,
       workDescription: this._workDescription,
       isAvailable: this._isAvailable,
+      isBanned: this._isBanned,
       cachedAverageRating: this._cachedAverageRating,
       cachedTotalRatings: this._cachedTotalRatings,
       cachedCompletionRate: this._cachedCompletionRate,
@@ -155,12 +161,24 @@ export class User {
       socialLinks: this._socialLinks,
       workDescription: this._workDescription,
       isAvailable: this._isAvailable,
+      isBanned: this._isBanned,
       cachedAverageRating: this._cachedAverageRating,
       cachedTotalRatings: this._cachedTotalRatings,
       cachedCompletionRate: this._cachedCompletionRate,
       createdAt: this._createdAt,
       updatedAt: this._updatedAt,
     };
+  }
+
+  // Business Logic - Admin
+  ban(): void {
+    this._isBanned = true;
+    this._updatedAt = new Date();
+  }
+
+  unban(): void {
+    this._isBanned = false;
+    this._updatedAt = new Date();
   }
 
   // Business Logic - Auth
@@ -217,6 +235,9 @@ export class User {
   }
   get isAvailable(): boolean | undefined {
     return this._isAvailable;
+  }
+  get isBanned(): boolean | undefined {
+    return this._isBanned;
   }
   get cachedAverageRating(): number | undefined {
     return this._cachedAverageRating;

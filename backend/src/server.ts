@@ -10,6 +10,7 @@ import { UsersRoute } from '@routes/users.route';
 import { AuthRoute } from '@routes/auth.route';
 import { CommissionsRoute } from '@routes/commissions.route';
 import { ChatRoute } from '@routes/chat.route';
+import { AdminRoute } from '@routes/admin.routes';
 
 // Connect to MongoDB
 mongoose.connect(MONGO_URI)
@@ -39,7 +40,8 @@ export const createApp = () => {
     container.resolve(UsersRoute), 
     container.resolve(AuthRoute),
     container.resolve(CommissionsRoute),
-    container.resolve(ChatRoute)
+    container.resolve(ChatRoute),
+    container.resolve(AdminRoute)
   ];
   return new App(routes);
 };

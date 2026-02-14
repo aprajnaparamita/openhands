@@ -24,6 +24,9 @@ export default function Header() {
           <Link to="/profile/edit" className={styles['nav-item']}>
             My Profile
           </Link>
+          <Link to="/admin" className={styles['nav-item']}>
+            Admin
+          </Link>
           <a href='https://github.com/aprajnaparamita/openhands' target='_blank' className={styles['nav-item']} rel='noreferrer'>
             Github
           </a>
