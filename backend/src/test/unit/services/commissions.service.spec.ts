@@ -16,12 +16,15 @@ describe('CommissionsService', () => {
     mockCommissionsRepository = {
       save: jest.fn(),
       findById: jest.fn(),
-      findAll: jest.fn(),
       update: jest.fn(),
       findByProviderId: jest.fn(),
       findByRequesterId: jest.fn(),
-      getAvailable: jest.fn(),
-    };
+      findByUserId: jest.fn(),
+      findAllByUserId: jest.fn(),
+      findAvailable: jest.fn(),
+      findDisputed: jest.fn(),
+      getStats: jest.fn(),
+    } as any;
 
     mockUsersRepository = {
       findById: jest.fn(),
@@ -61,7 +64,7 @@ describe('CommissionsService', () => {
 
   describe('fundCommission', () => {
     it('should throw 404 if commission not found', async () => {
-      mockCommissionsRepository.findById.mockResolvedValue(null);
+      mockCommissionsRepository.findById.mockResolvedValue(undefined);
 
       await expect(commissionsService.fundCommission('id', 'user')).rejects.toThrow(HttpException);
     });

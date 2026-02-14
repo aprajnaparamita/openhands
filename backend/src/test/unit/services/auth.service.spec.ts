@@ -2,13 +2,19 @@ import { User } from '@entities/user.entity';
 import { UsersRepository } from '@repositories/users.repository';
 import { AuthService } from '@services/auth.service';
 
+import { CaptchaService } from '@services/captcha.service';
+
 describe('AuthService (with UserMemoryRepository)', () => {
   let authService: AuthService;
   let userRepo: UsersRepository;
+  let mockCaptchaService: CaptchaService;
 
   beforeEach(async () => {
     userRepo = new UsersRepository();
-    authService = new AuthService(userRepo);
+    mockCaptchaService = {
+      verifyToken: jest.fn(),
+    } as any;
+    authService = new AuthService(userRepo, mockCaptchaService);
   });
 
   it('should login with a new wallet address (signup)', async () => {

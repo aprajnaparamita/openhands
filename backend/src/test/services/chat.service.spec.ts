@@ -1,6 +1,7 @@
 import 'reflect-metadata';
 import { ChatService } from '../../services/chat.service';
 import { HttpException } from '../../exceptions/httpException';
+import { ContentSecurityService } from '../../services/content-security.service';
 
 // Mock PubNub
 jest.mock('pubnub', () => {
@@ -12,9 +13,15 @@ jest.mock('pubnub', () => {
 
 describe('ChatService', () => {
   let chatService: ChatService;
+  let mockContentSecurity: jest.Mocked<ContentSecurityService>;
 
   beforeEach(() => {
-    chatService = new ChatService();
+    mockContentSecurity = {
+      checkPII: jest.fn(),
+      checkProfanity: jest.fn(),
+      checkImageSafety: jest.fn(),
+    } as any;
+    chatService = new ChatService(mockContentSecurity);
   });
 
   describe('sendMessage', () => {
@@ -23,11 +30,17 @@ describe('ChatService', () => {
     });
 
     it('should throw error for PII (email)', async () => {
+      mockContentSecurity.checkPII.mockImplementation(() => {
+        throw new HttpException(400, 'PII Detected');
+      });
       await expect(chatService.sendMessage('user1', 'comm1', { text: 'Contact me at test@example.com' }))
         .rejects.toThrow(HttpException);
     });
 
     it('should throw error for PII (phone)', async () => {
+      mockContentSecurity.checkPII.mockImplementation(() => {
+        throw new HttpException(400, 'PII Detected');
+      });
       await expect(chatService.sendMessage('user1', 'comm1', { text: 'Call me at 123-456-7890' }))
         .rejects.toThrow(HttpException);
     });
@@ -44,6 +57,9 @@ describe('ChatService', () => {
     });
 
     it('should block unsafe images', async () => {
+      mockContentSecurity.checkImageSafety.mockImplementation(async () => {
+        throw new HttpException(400, 'Image detected as unsafe content');
+      });
       await expect(chatService.sendMessage('user1', 'comm1', { imageUrl: 'http://example.com/unsafe.jpg' }))
         .rejects.toThrow('Image detected as unsafe content');
     });

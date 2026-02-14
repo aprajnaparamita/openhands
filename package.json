@@ -1,10 +1,6 @@
 {
   "name": "OpenHands",
   "private": true,
-  "workspaces": [
-    "backend",
-    "frontend"
-  ],
   "scripts": {
     "dev": "concurrently \"pnpm --prefix backend run dev\" \"pnpm --prefix start\""
   },

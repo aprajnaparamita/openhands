@@ -29,7 +29,7 @@ describe('Commissions API', () => {
 
     const commissionData = {
       title: 'New Commission',
-      description: 'Test Description',
+      description: 'Test Description must be at least 20 characters long',
       price: 100,
       deadline: new Date().toISOString()
     };
@@ -47,9 +47,11 @@ describe('Commissions API', () => {
   it('should get available commissions', async () => {
     // 1. Login and Create a funded commission (simulated)
     // Since we are mocking the repository, we can just check if the endpoint returns empty list initially
+    const cookie = await login();
     
     const res = await request(server)
-      .get(`${prefix}/commissions/available`);
+      .get(`${prefix}/commissions/available`)
+      .set('Cookie', cookie);
     
     expect(res.statusCode).toBe(200);
     expect(Array.isArray(res.body.data)).toBe(true);
@@ -64,7 +66,7 @@ describe('Commissions API', () => {
       .set('Cookie', cookie)
       .send({
         title: 'For ID Check',
-        description: 'Desc',
+        description: 'Test Description must be at least 20 characters long',
         price: 50
       });
     

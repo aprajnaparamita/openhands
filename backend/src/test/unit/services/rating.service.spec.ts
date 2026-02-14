@@ -35,7 +35,7 @@ describe('RatingService', () => {
 
   describe('createRating', () => {
     it('should throw 404 if commission not found', async () => {
-      mockCommissionsRepository.findById.mockResolvedValue(null);
+      mockCommissionsRepository.findById.mockResolvedValue(undefined);
 
       await expect(ratingService.createRating({
         commissionId: 'id',
@@ -98,7 +98,7 @@ describe('RatingService', () => {
         updatedAt: new Date()
       });
       mockCommissionsRepository.findById.mockResolvedValue(commission);
-      mockRatingsRepository.findByCommissionId.mockResolvedValue(null);
+      mockRatingsRepository.findByCommissionId.mockResolvedValue(undefined);
       mockRatingsRepository.save.mockImplementation(async (r) => r);
 
       const result = await ratingService.createRating({

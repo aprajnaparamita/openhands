@@ -377,4 +377,8 @@ export class Commission {
       updatedAt: this._updatedAt,
     };
   }
+
+  toJSON() {
+    return this.toResponse();
+  }
 }

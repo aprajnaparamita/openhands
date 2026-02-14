@@ -30,69 +30,84 @@ const prodFile = join(logDir, 'app');
 const devFile = join(logDir, 'app.dev');
 const errorFile = join(logDir, 'error');
 
+const isTest = NODE_ENV === 'test';
+
 // Pino Instance
+const targets = [];
+
+if (isProd) {
+  targets.push(
+    {
+      target: 'pino-roll',
+      level: logLevel,
+      options: {
+        file: prodFile,
+        frequency: 'daily',
+        size: '50m',
+        dateFormat: 'yyyy-MM-dd',
+        extension: '.log',
+        mkdir: true,
+        symlink: true,
+        limit: { count: 30 },
+      },
+    },
+    {
+      target: 'pino-roll',
+      level: 'error',
+      options: {
+        file: errorFile,
+        frequency: 'daily',
+        size: '50m',
+        dateFormat: 'yyyy-MM-dd',
+        extension: '.log',
+        mkdir: true,
+        symlink: true,
+        limit: { count: 60 },
+      },
+    }
+  );
+} else if (isTest) {
+  // Test environment: Console only, no file logging to avoid race conditions
+  targets.push({
+    target: 'pino-pretty',
+    level: 'error', // Reduce noise in tests, only show errors
+    options: {
+      colorize: true,
+      translateTime: 'HH:MM:ss',
+      ignore: 'pid,hostname',
+    },
+  });
+} else {
+  // Development
+  targets.push(
+    {
+      target: 'pino-pretty',
+      level: logLevel,
+      options: {
+        colorize: true,
+        translateTime: 'yyyy-mm-dd HH:MM:ss',
+        ignore: 'pid,hostname',
+      },
+    },
+    {
+      target: 'pino-roll',
+      level: logLevel,
+      options: {
+        file: devFile,
+        frequency: 'daily',
+        size: '20m',
+        dateFormat: 'yyyy-MM-dd',
+        extension: '.log',
+        mkdir: true,
+        symlink: true,
+        limit: { count: 7 },
+      },
+    }
+  );
+}
+
 const transport = pino.transport({
-  targets: isProd
-    ? [
-        // prod: Date/Size based rolling + 30 days retention (all logs)
-        {
-          target: 'pino-roll',
-          level: logLevel,
-          options: {
-            file: prodFile, // Final file: app.2025-08-29.log etc.
-            frequency: 'daily', // 'daily' | 'hourly' | number(ms)
-            size: '50m', // Split by size
-            dateFormat: 'yyyy-MM-dd',
-            extension: '.log',
-            mkdir: true,
-            symlink: true, // Create symbolic link for current.log
-            limit: { count: 30 }, // Keep 30
-            // limit: { count: 30, removeOtherLogFiles: false }, // Caution with PM2/Cluster
-          },
-        },
-        // prod: Error-only file (separate policy like 60 days retention possible)
-        {
-          target: 'pino-roll',
-          level: 'error',
-          options: {
-            file: errorFile,
-            frequency: 'daily',
-            size: '50m',
-            dateFormat: 'yyyy-MM-dd',
-            extension: '.log',
-            mkdir: true,
-            symlink: true,
-            limit: { count: 60 },
-          },
-        },
-      ]
-    : [
-        // dev: Pretty console output
-        {
-          target: 'pino-pretty',
-          level: logLevel,
-          options: {
-            colorize: true,
-            translateTime: 'yyyy-mm-dd HH:MM:ss',
-            ignore: 'pid,hostname',
-          },
-        },
-        // dev: If you want to roll files as well (optional) — delete this block if not needed
-        {
-          target: 'pino-roll',
-          level: logLevel,
-          options: {
-            file: devFile,
-            frequency: 'daily',
-            size: '20m',
-            dateFormat: 'yyyy-MM-dd',
-            extension: '.log',
-            mkdir: true,
-            symlink: true,
-            limit: { count: 7 },
-          },
-        },
-      ],
+  targets,
 });
 
 // ── Logger Instance

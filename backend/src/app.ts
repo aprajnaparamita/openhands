@@ -57,25 +57,20 @@ class App {
       Sentry.init({
         dsn: SENTRY_DSN,
         integrations: [
-          new Sentry.Integrations.Http({ tracing: true }),
-          new Sentry.Integrations.Express({ app: this.app }),
+          Sentry.httpIntegration(),
+          Sentry.expressIntegration(),
           nodeProfilingIntegration(),
         ],
         tracesSampleRate: 1.0,
         profilesSampleRate: 1.0,
       });
-      // RequestHandler creates a separate execution context, so that all
-      // transactions/spans/breadcrumbs are isolated across requests
-      this.app.use(Sentry.Handlers.requestHandler());
-      // TracingHandler creates a trace for every incoming request
-      this.app.use(Sentry.Handlers.tracingHandler());
       logger.info('Sentry initialized');
     }
   }
 
   private initializeSentryErrorHandler() {
     if (SENTRY_DSN) {
-      this.app.use(Sentry.Handlers.errorHandler());
+      Sentry.setupExpressErrorHandler(this.app);
     }
   }
 
